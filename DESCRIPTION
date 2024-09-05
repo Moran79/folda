@@ -1,12 +1,24 @@
 Package: folda
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: Forward Stepwise Discriminant Analysis Using ULDA and Pillai's Trace
+Version: 0.1.0
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
-License: `use_mit_license()`, `use_gpl3_license()` or friends to pick a
-    license
+    person(given = "Siyu",
+           family = "Wang",
+           role = c("aut", "cre"),
+           email = "iamwangsiyu@gmail.com",
+           comment = c(ORCID = "0009-0005-2098-7089"))
+Description: This package implements a novel forward stepwise discriminant analysis framework 
+    that integrates Pillai’s trace with Uncorrelated Linear Discriminant Analysis (ULDA), 
+    providing an improvement over traditional stepwise LDA methods that rely on Wilks' Lambda. 
+    The replacement of Wilks' Lambda with Pillai's trace allows the method to better handle 
+    scenarios involving perfect group separation, where Wilks' Lambda fails. 
+    The package is particularly useful for high-dimensional data where the within-class 
+    scatter matrix is non-invertible. It offers robust feature selection and classification 
+    accuracy.
+License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+Imports: 
+    Rcpp,
+    RcppEigen
