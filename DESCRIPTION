@@ -22,3 +22,5 @@ RoxygenNote: 7.2.3
 Imports: 
     Rcpp,
     RcppEigen
+URL: https://github.com/Moran79/folda
+BugReports: https://github.com/Moran79/folda/issues
