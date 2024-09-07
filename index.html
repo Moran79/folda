@@ -5,14 +5,21 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Forward Stepwise Discriminant Analysis Using ULDA and Pillai's Trace • folda</title>
+<title>Forward Stepwise Discriminant Analysis with Pillai's Trace • folda</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
+<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
+<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
+<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
 <script src="deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="deps/font-awesome-6.4.2/css/all.min.css" rel="stylesheet">
 <link href="deps/font-awesome-6.4.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Forward Stepwise Discriminant Analysis Using ULDA and Pillai's Trace">
-<meta name="description" content="This package implements a novel forward stepwise discriminant analysis framework that integrates Pillai’s trace with Uncorrelated Linear Discriminant Analysis (ULDA), providing an improvement over traditional stepwise LDA methods that rely on Wilks Lambda. The replacement of Wilks Lambda with Pillais trace allows the method to better handle scenarios involving perfect group separation, where Wilks Lambda fails. The package is particularly useful for high-dimensional data where the within-class scatter matrix is non-invertible. It offers robust feature selection and classification accuracy.">
-<meta property="og:description" content="This package implements a novel forward stepwise discriminant analysis framework that integrates Pillai’s trace with Uncorrelated Linear Discriminant Analysis (ULDA), providing an improvement over traditional stepwise LDA methods that rely on Wilks Lambda. The replacement of Wilks Lambda with Pillais trace allows the method to better handle scenarios involving perfect group separation, where Wilks Lambda fails. The package is particularly useful for high-dimensional data where the within-class scatter matrix is non-invertible. It offers robust feature selection and classification accuracy.">
+<script src="deps/headroom-0.11.0/headroom.min.js"></script><script src="deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="deps/search-1.0.0/fuse.min.js"></script><script src="deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="pkgdown.js"></script><meta property="og:title" content="Forward Stepwise Discriminant Analysis with Pillai's Trace">
+<meta name="description" content="A novel forward stepwise discriminant analysis framework that integrates Pillai’s trace with Uncorrelated Linear Discriminant Analysis (ULDA), providing an improvement over traditional stepwise LDA methods that rely on Wilks Lambda. The replacement of Wilks Lambda with Pillais trace allows the method to better handle scenarios involving perfect group separation, where Wilks Lambda fails. This model is particularly useful for high-dimensional data where the within-class scatter matrix is non-invertible. It offers robust feature selection and classification accuracy.">
+<meta property="og:description" content="A novel forward stepwise discriminant analysis framework that integrates Pillai’s trace with Uncorrelated Linear Discriminant Analysis (ULDA), providing an improvement over traditional stepwise LDA methods that rely on Wilks Lambda. The replacement of Wilks Lambda with Pillais trace allows the method to better handle scenarios involving perfect group separation, where Wilks Lambda fails. This model is particularly useful for high-dimensional data where the within-class scatter matrix is non-invertible. It offers robust feature selection and classification accuracy.">
+<meta property="og:image" content="http://iamwangsiyu.com/folda/logo.png">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -31,13 +38,9 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
+<li class="nav-item"><a class="nav-link" href="articles/folda.html">Get started</a></li>
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
-<li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="articles/my-vignette.html">my-vignette</a></li>
-  </ul>
-</li>
+<li class="nav-item"><a class="nav-link" href="news/index.html">Changelog</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
@@ -52,40 +55,124 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="folda">folda<a class="anchor" aria-label="anchor" href="#folda"></a>
-</h1></div>
+<div class="page-header">
+<img src="logo.png" class="logo" alt=""><h1 id="folda-">folda 
+<a class="anchor" aria-label="anchor" href="#folda-"></a>
+</h1>
+</div>
 <!-- badges: start -->
 
-<p>The goal of folda is to …</p>
+<p>The <code>folda</code> package is an R modeling tool designed for fitting Forward Stepwise Linear Discriminant Analysis (LDA) and Uncorrelated Linear Discriminant Analysis (ULDA). If you’re unfamiliar with stepwise LDA or ULDA, please refer to the following resources:</p>
+<p>For stepwise LDA using Wilks’ Lambda, see:</p>
+<ul>
+<li>Section 6.11.1 in <em>Methods of Multivariate Analysis, Third Edition</em> by Alvin C. Rencher and William F. Christensen (2012).</li>
+</ul>
+<p>For ULDA, refer to:</p>
+<ul>
+<li>Ye, J., &amp; Yu, B. (2005). <em>Characterization of a family of algorithms for generalized discriminant analysis on undersampled problems.</em> Journal of Machine Learning Research, 6(4). <a href="https://www.jmlr.org/papers/volume6/ye05a/ye05a.pdf" class="external-link">Link</a>.</li>
+</ul>
+<p>For a combination of ULDA and forward LDA using Pillai’s trace, see:</p>
+<ul>
+<li>Wang, S. (2024). <em>A New Forward Discriminant Analysis Framework Based on Pillai’s Trace and ULDA</em>. arXiv preprint arXiv:2409.03136. <a href="https://arxiv.org/abs/2409.03136" class="external-link">Link</a>.</li>
+</ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
-<p>You can install the development version of folda from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"LDATree"</span><span class="op">)</span></span></code></pre></div>
+<p>You can install the development version of folda from <a href="https://github.com/" class="external-link">GitHub</a> with:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># install.packages("devtools")</span></span>
 <span><span class="fu">devtools</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"Moran79/folda"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
+<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Moran79/folda" class="external-link">folda</a></span><span class="op">)</span></span>
-<span><span class="co">## basic example code</span></span></code></pre></div>
-<p>What is special about using <code>README.Rmd</code> instead of just <code>README.md</code>? You can include R chunks like so:</p>
+<p>If you’ve ever been frustrated by the warnings and errors from <code><a href="https://rdrr.io/pkg/MASS/man/lda.html" class="external-link">MASS::lda()</a></code>, you will appreciate the ULDA implementation in <code><a href="reference/folda.html">folda()</a></code>. It offers several key improvements:</p>
+<ul>
+<li><p><strong>No more “constant within group” errors!</strong> ULDA can handle constant columns and perfect separation of groups.</p></li>
+<li><p><strong>Automatic missing value handling!</strong> The implementation seamlessly integrates automatic missing value imputation during both training and testing phases.</p></li>
+<li><p><strong>Fast!</strong> ULDA is implemented using the Generalized Singular Value Decomposition (GSVD) method, which diagonalizes both within-class and total scatter matrices simultaneously, offering a speed advantage over the sequential diagonalization used in <code><a href="https://rdrr.io/pkg/MASS/man/lda.html" class="external-link">MASS::lda()</a></code> (see Howland et al., 2003 for more details). We have also rewritten the matrix decomposition modules (SVD, QR) using <code>RcppEigen</code>, further improving computational efficiency by leveraging optimized C++ code.</p></li>
+<li><p><strong>Better visualization!</strong> <code>folda</code> uses <code>ggplot2</code> to provide visualizations of class separation in projected 2D spaces (or 1D histograms), offering valuable insights.</p></li>
+</ul>
+<p>For the forward LDA implementation, <code>folda</code> offers the following advantages over the classical framework:</p>
+<ul>
+<li><p><strong>No issues with multicollinearity or perfect linear dependency!</strong> Since <code><a href="reference/folda.html">folda()</a></code> is built on ULDA, it effectively solves for the scaling matrix.</p></li>
+<li><p><strong>Handles perfect separation and offers greater power!</strong> The classical approach using Wilks’ Lambda has known limitations, including premature stopping when some (not all) groups are perfectly separated. Pillai’s trace, as used in <code><a href="reference/folda.html">folda()</a></code>, not only effectively addresses perfect separation, but has also been shown to generally have greater statistical power than Wilks’ Lambda (Rencher et al., 2002).</p></li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="basic-usage">Basic Usage<a class="anchor" aria-label="anchor" href="#basic-usage"></a>
+</h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">cars</span><span class="op">)</span></span>
-<span><span class="co">#&gt;      speed           dist       </span></span>
-<span><span class="co">#&gt;  Min.   : 4.0   Min.   :  2.00  </span></span>
-<span><span class="co">#&gt;  1st Qu.:12.0   1st Qu.: 26.00  </span></span>
-<span><span class="co">#&gt;  Median :15.0   Median : 36.00  </span></span>
-<span><span class="co">#&gt;  Mean   :15.4   Mean   : 42.98  </span></span>
-<span><span class="co">#&gt;  3rd Qu.:19.0   3rd Qu.: 56.00  </span></span>
-<span><span class="co">#&gt;  Max.   :25.0   Max.   :120.00</span></span></code></pre></div>
-<p>You’ll still need to render <code>README.Rmd</code> regularly, to keep <code>README.md</code> up-to-date. <code>devtools::build_readme()</code> is handy for this.</p>
-<p>You can also embed plots, for example:</p>
-<p><img src="reference/figures/README-pressure-1.png" width="100%"></p>
-<p>In that case, don’t forget to commit and push the resulting figure files, so they display on GitHub and CRAN.</p>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Moran79/folda" class="external-link">folda</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">mpg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="va"><a href="https://ggplot2.tidyverse.org/reference/mpg.html" class="external-link">mpg</a></span><span class="op">)</span></span>
+<span><span class="va">datX</span> <span class="op">&lt;-</span> <span class="va">mpg</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span> <span class="co"># All predictors without Y</span></span>
+<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span> <span class="co"># we try to predict "cyl" (number of cylinders)</span></span>
+<span></span>
+<span><span class="co"># build a ULDA model with all variables</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/folda.html">folda</a></span><span class="op">(</span>datX <span class="op">=</span> <span class="va">datX</span>, response <span class="op">=</span> <span class="va">response</span>, subsetMethod <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># build a ULDA model with forward selection via Pillai's trace</span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/folda.html">folda</a></span><span class="op">(</span>datX <span class="op">=</span> <span class="va">datX</span>, response <span class="op">=</span> <span class="va">response</span>, subsetMethod <span class="op">=</span> <span class="st">"forward"</span>, testStat <span class="op">=</span> <span class="st">"Pillai"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># print the results</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="co"># 6 out of 11 variables are selected, displ is the most important among them</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Overall Pillai's trace: 1.325</span></span>
+<span><span class="co">#&gt; Associated p-value: 4.636e-74</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Prediction Results on Training Data:</span></span>
+<span><span class="co">#&gt; Refitting Accuracy: 0.9188</span></span>
+<span><span class="co">#&gt; Gini Index: 0.7004</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Confusion Matrix:</span></span>
+<span><span class="co">#&gt;          Actual</span></span>
+<span><span class="co">#&gt; Predicted  4  5  6  8</span></span>
+<span><span class="co">#&gt;         4 69  0  3  0</span></span>
+<span><span class="co">#&gt;         5  8  4  2  0</span></span>
+<span><span class="co">#&gt;         6  4  0 74  2</span></span>
+<span><span class="co">#&gt;         8  0  0  0 68</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Group means of LD scores:</span></span>
+<span><span class="co">#&gt;           LD1         LD2        LD3</span></span>
+<span><span class="co">#&gt; 4  3.05298379  0.02700248 -0.3555829</span></span>
+<span><span class="co">#&gt; 5  1.87744449 -4.45014946  0.8156167</span></span>
+<span><span class="co">#&gt; 6  0.06757888  0.28356907  0.5911862</span></span>
+<span><span class="co">#&gt; 8 -3.71628852 -0.09697943 -0.3023424</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Forward Selection Results:</span></span>
+<span><span class="co">#&gt;                var statOverall   statDiff  threshold</span></span>
+<span><span class="co">#&gt; 1            displ    0.873393 0.87339300 0.06545381</span></span>
+<span><span class="co">#&gt; 2  modelnew beetle    1.029931 0.15653777 0.05673510</span></span>
+<span><span class="co">#&gt; 3       modeljetta    1.141651 0.11172064 0.05496185</span></span>
+<span><span class="co">#&gt; 4 modelcaravan 2wd    1.210165 0.06851331 0.05363507</span></span>
+<span><span class="co">#&gt; 5     classmidsize    1.263449 0.05328468 0.05276500</span></span>
+<span><span class="co">#&gt; 6              cty    1.325255 0.06180560 0.05194279</span></span>
+<span></span>
+<span><span class="co"># plot the results</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, datX <span class="op">=</span> <span class="va">datX</span>, response <span class="op">=</span> <span class="va">response</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;"></p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="co"># make predictions</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">datX</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; [1] "4" "4" "4" "4" "6" "4"</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">datX</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Posterior probabilities</span></span>
+<span><span class="co">#&gt;           4            5            6            8</span></span>
+<span><span class="co">#&gt; 1 0.9966769 7.475058e-08 0.0033230408 7.023764e-12</span></span>
+<span><span class="co">#&gt; 2 0.9994438 1.401133e-08 0.0005562131 5.338710e-13</span></span>
+<span><span class="co">#&gt; 3 0.9970911 3.835722e-08 0.0029088506 1.738154e-11</span></span>
+<span><span class="co">#&gt; 4 0.9983963 2.196016e-08 0.0016037009 7.365641e-12</span></span>
+<span><span class="co">#&gt; 5 0.3122116 6.809673e-07 0.6877815595 6.173116e-06</span></span>
+<span><span class="co">#&gt; 6 0.5995781 4.275271e-07 0.4004193019 2.123291e-06</span></span></code></pre></div>
+<p>More examples can be found in the <a href="https://iamwangsiyu.com/folda/articles/folda.html" class="external-link">vignette</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
+</h2>
+<p>If you encounter a clear bug, please file an issue with a minimal reproducible example on <a href="https://github.com/Moran79/folda/issues" class="external-link">GitHub</a></p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="links">
@@ -115,7 +202,7 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Siyu Wang <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0009-0005-2098-7089" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>Siyu Wang <br><small class="roles"> Author, maintainer, copyright holder </small> <a href="https://orcid.org/0009-0005-2098-7089" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
 </ul>
 </div>
 
@@ -123,6 +210,7 @@
 <h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
 <li><a href="https://CRAN.R-project.org/package=folda" class="external-link"><img src="https://www.r-pkg.org/badges/version/folda" alt="CRAN status"></a></li>
+<li><a href="https://github.com/Moran79/folda/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/Moran79/folda/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 </ul>
 </div>
 
