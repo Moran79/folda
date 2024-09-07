@@ -2,21 +2,37 @@
 % Please edit documentation in R/forwardSel.R
 \name{forwardSel}
 \alias{forwardSel}
-\title{Title}
+\title{Forward Selection via Multivariate Test Statistics}
 \usage{
-forwardSel(
-  datX,
-  response,
-  method = "Pillai",
-  firstOnly = FALSE,
-  alpha = 0.05,
-  correction = TRUE,
-  fixThreshold = FALSE
-)
+forwardSel(m, response, testStat = "Pillai", alpha = 0.1, correction = TRUE)
 }
 \arguments{
-\item{fixThreshold}{}
+\item{m}{A numeric matrix containing the predictor variables. Rows represent
+observations and columns represent variables.}
+
+\item{response}{A factor representing the response variable with multiple
+levels (groups).}
+
+\item{testStat}{A character string specifying the test statistic to use. Can
+be \code{"Pillai"} (default) or \code{"Wilks"}.}
+
+\item{alpha}{A numeric value between 0 and 1 specifying the significance
+level for the test. Default is 0.1.}
+
+\item{correction}{A logical value indicating whether to apply a multiple
+comparison correction. Default is \code{TRUE}.}
+}
+\value{
+A list with three components: \item{currentVarList}{A vector of
+selected variable indices based on the forward selection process.}
+\item{forwardInfo}{A data frame containing detailed information about the
+forward selection process, including the selected variables, test
+statistics, and thresholds.} \item{stopInfo}{A character string describing
+why the selection process stopped.}
 }
 \description{
-Title
+This function performs forward selection on a dataset based on multivariate
+test statistics (\code{Pillai} or \code{Wilks}). It iteratively adds variables that
+contribute the most to the test statistic until no significant variables are
+found or a stopping criterion is met.
 }

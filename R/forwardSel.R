@@ -1,159 +1,161 @@
-#' Title
+#' Forward Selection via Multivariate Test Statistics
 #'
-#' @param datX
-#' @param response
-#' @param method
-#' @param firstOnly
-#' @param alpha
-#' @param correction
-#' @param fixThreshold
+#' This function performs forward selection on a dataset based on multivariate
+#' test statistics (`Pillai` or `Wilks`). It iteratively adds variables that
+#' contribute the most to the test statistic until no significant variables are
+#' found or a stopping criterion is met.
 #'
-#' @return
-#' @export
+#' @param m A numeric matrix containing the predictor variables. Rows represent
+#'   observations and columns represent variables.
+#' @param response A factor representing the response variable with multiple
+#'   levels (groups).
+#' @param testStat A character string specifying the test statistic to use. Can
+#'   be `"Pillai"` (default) or `"Wilks"`.
+#' @param alpha A numeric value between 0 and 1 specifying the significance
+#'   level for the test. Default is 0.1.
+#' @param correction A logical value indicating whether to apply a multiple
+#'   comparison correction. Default is `TRUE`.
 #'
-#' @examples
-forwardSel <- function(datX, response, method = "Pillai", firstOnly = FALSE, alpha = 0.05, correction = TRUE, fixThreshold = FALSE){
-  #> Given a matrix, output the important vars
-  #> method = Wilks / Pillai
+#' @return A list with three components: \item{currentVarList}{A vector of
+#'   selected variable indices based on the forward selection process.}
+#'   \item{forwardInfo}{A data frame containing detailed information about the
+#'   forward selection process, including the selected variables, test
+#'   statistics, and thresholds.} \item{stopInfo}{A character string describing
+#'   why the selection process stopped.}
+forwardSel <- function(m,
+                       response,
+                       testStat = "Pillai",
+                       alpha = 0.1,
+                       correction = TRUE){
 
-  # Pre-processing
-  response <- droplevels(as.factor(response)) # some levels are branched out
+  testStat <- match.arg(testStat, c("Pillai", "Wilks"))
+  if (alpha < 0 || alpha > 1) stop("Parameter 'alpha' must be between 0 and 1")
+  if (!is.logical(correction) || length(correction) != 1) stop("correction must be either TRUE or FALSE")
 
-  # constant factors
-  levelObs <- sapply(datX, nlevels)
-  if(any(levelObs == 1)) datX[,levelObs == 1] <- 0
+  # Initialization -----------------------------------------------
 
-  if(is.data.frame(datX)){
-    modelFrame <- model.frame(formula = ~.-1, datX, na.action = "na.fail")
-    Terms <- terms(modelFrame)
-    m <- scale(model.matrix(Terms, modelFrame)) # constant cols would be changed to NaN in this step
-  }else if (is.matrix(datX)){
-    m <- scale(datX); colnames(m) <- paste0("X", seq_len(ncol(m)))
-  }
-  idxOriginal <- currentCandidates <- as.vector(which(apply(m, 2, function(x) !any(is.nan(x))))) # remove constant columns and intercept
+  N = nrow(m); J = nlevels(response); p = 0
+  currentCandidates <- seq_len(ncol(m)); currentVarList = c()
+  statSaved <- numeric(ncol(m) + 1) + ifelse(testStat == "Wilks", 1, 0) # (i+1)-th place saves i-th result
+  statDiff <- numeric(ncol(m)); stopInfo <- "Normal"
 
-  # Program starts
-  m <- m[, currentCandidates, drop = FALSE] # all columns should be useful
   groupMeans <- tapply(c(m), list(rep(response, dim(m)[2]), col(m)), function(x) mean(x, na.rm = TRUE))
   mW <- m - groupMeans[response, , drop = FALSE]
-
-  # Initialize
-  n = nrow(m); g = nlevels(response); p = 0; currentVarList = c()
-  previousPillai <- previousDiff <- previousDiffDiff <- numeric(ncol(m)+1) + ifelse(method == "Wilks", 1, 0);
-  previousDiff[1] <- Inf; diffChecker <- 0
-  kRes <- 1; currentCandidates <- seq_len(ncol(m))
   Sw <- St <- matrix(NA, nrow = ncol(m), ncol = ncol(m))
-  diag(Sw) <- apply(mW^2,2,sum) / n; diag(St) <- apply(m^2,2,sum) / n
-  stopFlag <- 0;pillaiThreshold <- numeric(ncol(m))
+  diag(Sw) <- apply(mW^2, 2, sum) / N; diag(St) <- apply(m^2, 2, sum) / N
 
-  if(method == "Wilks"){
-    pillaiThreshold <- numeric(ncol(m))
-    maxVar <- seq_len(min(ncol(m), n-g-1))
-    if(correction){
-      correctionPower <- ncol(m) + 1 - maxVar
-    }else correctionPower <- 1
+  forwardInfo <- data.frame(var = character(ncol(m)),
+                            statOverall = NA,
+                            statDiff = NA)
 
-    if(fixThreshold){
-      pillaiThreshold <- (n-g-maxVar) / (n-g-maxVar + 4 * (g-1)) # 4 as threshold
-    }else pillaiThreshold[maxVar] <- (n-g-maxVar) / (n-g-maxVar + qf(1 - alpha / correctionPower, df1 = g - 1, n-g-maxVar) * (g-1))
-  }
+  if(N <= J) return(list(currentVarList = currentVarList, forwardInfo = forwardInfo, stopInfo = "No enough observations"))
 
-  stepInfo <- data.frame(var = character(2*ncol(m)),
-                         pillaiToEnter = 0,
-                         partialWilks = 0,
-                         threshold = pillaiThreshold,
-                         pillai = 0)
+  # Threshold for Wilks' Lambda
+  maxVar <- min(ncol(m), N - J); maxVarSeq <- seq_len(maxVar) - 1
+  if(correction){
+    correctionFactor <- ncol(m) - maxVarSeq
+  }else correctionFactor <- 1
+  threshold <- (N - J - maxVarSeq) / (N - J - maxVarSeq + qf(1 - alpha / correctionFactor, df1 = J - 1, N - J - maxVarSeq) * (J - 1))
 
-  #> If n <= g, which means there are too few observations,
-  #> we output all columns, and leave that problem to outside function
-  if(anyNA(pillaiThreshold)){
-    currentVarList <- currentCandidates; currentCandidates <- c()
-    stepInfo$var[seq_along(currentVarList)] <- colnames(m)[currentVarList]
-    stopFlag <- 4
-  }
+  # Main Loop -----------------------------------------------
 
-  # Stepwise selection starts!
-  while(length(currentCandidates) != 0){
+  while(length(currentCandidates) != 0 && p < maxVar){
     nCandidates <- length(currentCandidates)
     p = p + 1
-    if(method == "Pillai"){
-      gNow <- g - previousPillai[p]
-      correctionPower <- ifelse(correction, 1 / nCandidates, 1)
-      pillaiThreshold[p] <- qbeta((1 - alpha)^correctionPower, shape1 = (gNow - 1) / 2, shape2 = (n - gNow) / 2)
+
+    if(testStat == "Pillai"){ # Update threshold for Pillai
+      Jnow <- J - statSaved[p]
+      if(Jnow <= 1){
+        stopInfo <- "Perfect separation"
+        break
+      }
+      correctionFactor <- ifelse(correction, 1 / nCandidates, 1)
+      threshold[p] <- qbeta((1 - alpha)^correctionFactor, shape1 = (Jnow - 1) / 2, shape2 = (N - Jnow) / 2)
     }
 
-    if(firstOnly & p > 1){ # Only first variable needed to check type I error
-      stopFlag <- 6
-      break
-    }
-
-    # if(length(currentVarList) >= 5){ ### TESTING ON IRIS ONLY ###
-    #   stopFlag <- 7
-    #   break
-    # }
-
-    selectVarInfo <- selectVar(currentVar = currentVarList,
+    bestVarInfo <- getBestVar(currentVar = currentVarList,
                                newVar = currentCandidates,
                                Sw = Sw,
                                St = St,
-                               method = method)
-    bestVar <- selectVarInfo$varIdx
-    if(selectVarInfo$stopflag){ # If St = 0, stop. [Might never happens, since there are other variables to choose]
-      stopFlag <- 1
+                               testStat = testStat)
+    bestVar <- bestVarInfo$varIdx
+
+    if(bestVarInfo$stopflag){ # St = 0
+      stopInfo <- "Perfect linear dependency"
       break
     }
 
-    # get the difference in Pillai's trace
-    if(method == "Pillai"){
-      previousDiff[p+1] <- selectVarInfo$statistics - previousPillai[p]
-    }else{
-      previousDiff[p+1] <- selectVarInfo$statistics / previousPillai[p]
-      stepInfo$partialWilks[p] <- (n-g-p+1) / (g-1) * (1-previousDiff[p+1]) / previousDiff[p+1]
-    }
+    if(testStat == "Pillai"){
+      statDiff[p] <- bestVarInfo$stat - statSaved[p]
+    }else statDiff[p] <- bestVarInfo$stat / statSaved[p]
+    stopFlag <- ifelse(testStat == "Pillai",
+                       statDiff[p] < threshold[p],
+                       statDiff[p] > threshold[p])
 
-    # Check the stopping rule
-    stopFlag <- ifelse(method == "Pillai",
-                       previousDiff[p+1] < pillaiThreshold[p],
-                       previousDiff[p+1] > pillaiThreshold[p])
-
-    if(is.na(stopFlag)){ # Lambda = 0
-      stopFlag <- 5
+    if(stopFlag){
+      stopInfo <- "No significant variables"
       break
     }
 
-    if(stopFlag){ # If no significant variable selected, stop
-      stopFlag <- 2
-      break
-    }
-
-    # if(diffChecker == 10){ # converge
-    #   stopFlag <- 3
-    #   break
-    # }
-
-    # Add the variable into the model
-    previousPillai[p+1] <- selectVarInfo$statistics
+    # Save the info
     currentVarList <- c(currentVarList, bestVar)
-    currentCandidates <- setdiff(currentCandidates, bestVar)
-    stepInfo$var[kRes] <- colnames(m)[bestVar]
-    stepInfo$pillaiToEnter[kRes] <- previousDiff[p+1]
-    stepInfo$pillai[kRes] <- previousPillai[p+1]
-    kRes <- kRes + 1
+    currentCandidates <- setdiff(currentCandidates, c(bestVar, bestVarInfo$collinearVar))
+    forwardInfo$var[p] <- colnames(m)[bestVar]
+    forwardInfo$statDiff[p] <- statDiff[p]
+    forwardInfo$statOverall[p] <- statSaved[p+1] <- bestVarInfo$stat
+
+    if(testStat == "Wilks" && bestVarInfo$stat == 0){ # Lambda = 0
+      stopInfo <- "Wilks' Lambda = 0"
+      break
+    }
 
     # Update the Sw and St on the new added column
-    Sw[currentCandidates, bestVar] <- Sw[bestVar, currentCandidates] <- as.vector(t(mW[, currentCandidates, drop = FALSE]) %*% mW[,bestVar, drop = FALSE]) / n
-    St[currentCandidates, bestVar] <- St[bestVar, currentCandidates] <- as.vector(t(m[, currentCandidates, drop = FALSE]) %*% m[,bestVar, drop = FALSE]) / n
-
-    # Update Pillai Threshold
-    # getBetaThresholdSim <- function(m, response, alpha = 0.05, nSim = 100){
-    #   fakeCols <- matrix(rnorm(nSim * nrow(m)), ncol = 100)
-    #   apply(fakeCols, 2, function(x) 1)
-    # }
+    Sw[currentCandidates, bestVar] <- Sw[bestVar, currentCandidates] <- as.vector(crossprod(mW[, currentCandidates, drop = FALSE], mW[, bestVar, drop = FALSE])) / N
+    St[currentCandidates, bestVar] <- St[bestVar, currentCandidates] <- as.vector(crossprod(m[, currentCandidates, drop = FALSE], m[, bestVar, drop = FALSE])) / N
   }
 
-  # Remove the empty rows in the stepInfo if stepLDA does not select all variables
-  stepInfo$threshold = pillaiThreshold # Update the threshold used
-  stepInfo <- stepInfo[seq_along(currentVarList),]
+  forwardInfo <- cbind.data.frame(forwardInfo[seq_along(currentVarList), , drop = FALSE],
+                                  threshold = threshold[seq_along(currentVarList)])
+  return(list(currentVarList = currentVarList, forwardInfo = forwardInfo, stopInfo = stopInfo))
+}
 
-  return(list(currentVarList = idxOriginal[currentVarList], stepInfo = stepInfo, stopFlag = stopFlag))
+
+#' Select Best Variable at Current Step Based on Multivariate Test Statistics
+#'
+#' This function selects the best variable based on the specified multivariate
+#' test statistic (`Pillai` or `Wilks`). It evaluates the statistic for each
+#' candidate variable in `newVar` when combined with `currentVar`, and returns
+#' the index and test statistic of the best variable. It also identifies
+#' collinear variables.
+#'
+#' @param currentVar A numeric vector indicating the indices of currently
+#'   selected variables.
+#' @param newVar A numeric vector indicating the indices of candidate variables
+#'   to be tested.
+#' @param Sw A matrix representing the within-class scatter matrix.
+#' @param St A matrix representing the total scatter matrix.
+#' @param testStat A character string specifying the test statistic to use. Can
+#'   be either `"Pillai"` or `"Wilks"`. Default is `"Pillai"`.
+#'
+#' @return A list containing: \item{stopflag}{A logical value indicating whether
+#'   the best variable is collinear (i.e., should the selection stop).}
+#'   \item{varIdx}{The index of the selected variable from `newVar` based on the
+#'   test statistic.} \item{stat}{The value of the test statistic for the
+#'   selected variable.} \item{collinearVar}{A vector of indices from `newVar`
+#'   representing collinear variables.}
+getBestVar <- function(currentVar, newVar, Sw, St, testStat = "Pillai"){
+  if(testStat == "Pillai"){
+    statAll <- sapply(newVar, function(i) getPillai(Sw[c(i,currentVar),c(i,currentVar), drop = FALSE], St[c(i,currentVar),c(i,currentVar), drop = FALSE]))
+    currentVarIdx <- which.max(statAll)
+    collinearVar <- which(statAll == -1)
+  }else if(testStat == "Wilks"){
+    statAll <- sapply(newVar, function(i) getWilks(Sw[c(i,currentVar),c(i,currentVar), drop = FALSE], St[c(i,currentVar),c(i,currentVar), drop = FALSE]))
+    currentVarIdx <- which.min(statAll)
+    collinearVar <- which(statAll == 2)
+  }
+
+  return(list(stopflag = (currentVarIdx %in% collinearVar),
+              varIdx = newVar[currentVarIdx],
+              stat = statAll[currentVarIdx],
+              collinearVar = newVar[collinearVar]))
 }

@@ -22,5 +22,14 @@ RoxygenNote: 7.2.3
 Imports: 
     Rcpp,
     RcppEigen
-URL: https://github.com/Moran79/folda
+URL: https://github.com/Moran79/folda, http://iamwangsiyu.com/folda/
 BugReports: https://github.com/Moran79/folda/issues
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+LinkingTo: 
+    Rcpp,
+    RcppEigen
+VignetteBuilder: knitr
