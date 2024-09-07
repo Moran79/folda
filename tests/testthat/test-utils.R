@@ -31,7 +31,6 @@ test_that("Missing Value Imputation", {
                                     X5 = 3,
                                     X6 = factor("B", levels = LETTERS[1:2]),
                                     X5_FLAG = 1)
-  rownames(expected_result1ref) <- 6L
   expected_result2 <- data.frame(X3 = 1:5,
                                  X4 = factor(LETTERS[1:5]),
                                  X5 = c(5, 2, 3, 10, 5),
@@ -40,7 +39,6 @@ test_that("Missing Value Imputation", {
                                     X4 = factor("A", levels = LETTERS[1:5]),
                                     X5 = 5,
                                     X6 = factor("new0_0Level", levels = c("A", "B", "new0_0Level")))
-  rownames(expected_result2ref) <- 6L
   expect_equal(result1$data, expected_result1)
   expect_equal(result1$ref, expected_result1ref)
   expect_equal(result2$data, expected_result2)
