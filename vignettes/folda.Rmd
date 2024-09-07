@@ -2,7 +2,7 @@
 title: "Introduction to folda"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{folda}
+  %\VignetteIndexEntry{Introduction to folda}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,19 +16,12 @@ knitr::opts_chunk$set(
 
 The `folda` package is an R modeling tool designed for fitting Forward Stepwise Linear Discriminant Analysis (LDA) and Uncorrelated Linear Discriminant Analysis (ULDA). If you're unfamiliar with stepwise LDA or ULDA, please refer to the following resources:
 
-For stepwise LDA using Wilks' Lambda, see:
+* For stepwise LDA using Wilks' Lambda, see Section 6.11.1 in *Methods of Multivariate Analysis, Third Edition* by Alvin C. Rencher and William F. Christensen (2012).
 
-* Section 6.11.1 in *Methods of Multivariate Analysis, Third Edition* by Alvin C. Rencher and William F. Christensen (2012).
-
-For ULDA, refer to:
-
-* Ye, J., & Yu, B. (2005). *Characterization of a family of algorithms for generalized discriminant analysis on undersampled problems.* Journal of Machine Learning Research, 6(4).
+* For ULDA, refer to Ye, J., & Yu, B. (2005). *Characterization of a family of algorithms for generalized discriminant analysis on undersampled problems.* Journal of Machine Learning Research, 6(4).
     [Link](https://www.jmlr.org/papers/volume6/ye05a/ye05a.pdf).
 
-For a combination of ULDA and forward LDA using Pillai's trace, see:
-
-* Wang, S. (2024). *A New Forward Discriminant Analysis Framework Based on Pillai's Trace and ULDA*. arXiv preprint arXiv:2409.03136. [Link](https://arxiv.org/abs/2409.03136).
-
+* For a combination of ULDA and forward LDA using Pillai's trace, see Wang, S. (2024). *A New Forward Discriminant Analysis Framework Based on Pillai's Trace and ULDA*. arXiv preprint arXiv:2409.03136. [Link](https://arxiv.org/abs/2409.03136).
 
 
 # Why use the `folda` package?
@@ -52,26 +45,35 @@ For the forward LDA implementation, `folda` offers the following advantages over
 
 # Basic Usage of `folda`
 
-```{r, fig.asp=0.618,out.width = "70%",fig.align = "center"}
+```{r}
 library(folda)
-
-mpg <- as.data.frame(ggplot2::mpg)
+mpg <- as.data.frame(ggplot2::mpg) # Prepare the data
 datX <- mpg[, -5] # All predictors without Y
 response <- mpg[, 5] # we try to predict "cyl" (number of cylinders)
+```
 
-# build a ULDA model with all variables
+Build a ULDA model with all variables:
+
+```{r}
 fit <- folda(datX = datX, response = response, subsetMethod = "all")
+```
 
-# build a ULDA model with forward selection via Pillai's trace
+Build a ULDA model with forward selection via Pillai's trace:
+
+```{r}
 fit <- folda(datX = datX, response = response, subsetMethod = "forward", testStat = "Pillai")
-
-# print the results
 print(fit) # 6 out of 11 variables are selected, displ is the most important among them
+```
 
-# plot the results
+Plot the results:
+
+```{r, fig.asp=0.618,out.width = "70%",fig.align = "center"}
 plot(fit, datX = datX, response = response)
+```
 
-# make predictions
+Make predictions:
+
+```{r}
 head(predict(fit, datX, type = "response"))
 head(predict(fit, datX, type = "prob")) # Posterior probabilities
 ```
@@ -79,27 +81,23 @@ head(predict(fit, datX, type = "prob")) # Posterior probabilities
 
 # Comparison of Pillai's Trace and Wilks' Lambda
 
-Here, we compare their performances in a scenario where one group of classes is perfectly separable from another, a condition under which Wilks' Lambda performs poorly.
+Here, we compare their performances in a scenario where one group of classes is perfectly separable from another, a condition under which Wilks' Lambda performs poorly. Now let's predict the model of the car.
 
-```{r, fig.asp=0.618,out.width = "70%",fig.align = "center"}
-# now let's predict the model of the car
+```{r}
 fitW <- folda(mpg[, -2], mpg[, 2], testStat = "Wilks")
 fitW$forwardInfo
-
-#> Wilks' Lambda only selects manufacturer-audi, since it can separate a4,
-#> a4 quattro, and a6 quattro from other models. However, it unexpectedly stops
-#> since the Wilks' Lambda = 0, leading to a refitting accuracy of 0.0812.
-
-fitP <- folda(mpg[, -2], mpg[, 2], testStat = "Pillai")
-fitP$forwardInfo
-
-#> Pillai's trace selects 26 variables in total and the refitting
-#> accuracy is 0.9231.
 ```
 
-Additionally, `MASS::lda()` would throw an error in this scenario due to the "constant within groups" issue.
+Wilks' Lambda only selects manufacturer-audi, since it can separate a4, a4 quattro, and a6 quattro from other models. However, it unexpectedly stops since the Wilks' Lambda = 0, leading to a refitting accuracy of 0.0812.
 
-```{r, fig.asp=0.618,out.width = "70%",fig.align = "center"}
+```{r}
+fitP <- folda(mpg[, -2], mpg[, 2], testStat = "Pillai")
+fitP$forwardInfo
+```
+
+On the other hand, Pillai's trace selects 26 variables in total and the refitting accuracy is 0.9231. Additionally, `MASS::lda()` would throw an error in this scenario due to the "constant within groups" issue.
+
+```{r}
 # MASS::lda(model~., data = mpg)
 
 #> Error in lda.default(x, grouping, ...) : 
@@ -121,7 +119,7 @@ Two key functions involved in this process are `missingFix()` and `getDataInShap
   3. **Flag variable handling**: Missing value indicators (flag variables) are properly updated to reflect the missing values in the new data.
   4. **Factor level updating**: For categorical variables, factor levels are updated to match the reference. If a factor variable in the new data contains levels that are not present in the reference, those levels are removed, and the values are set to match the reference. Redundant levels are also removed.
 
-```{r, fig.asp=0.618,out.width = "70%",fig.align = "center"}
+```{r}
 # Create a dataset with missing values
 (datNA <- data.frame(X1 = rep(NA, 5), # All values are NA
                      X2 = factor(rep(NA, 5), levels = LETTERS[1:3]), # Factor with all NA values
@@ -129,46 +127,55 @@ Two key functions involved in this process are `missingFix()` and `getDataInShap
                      X4 = LETTERS[1:5], # Character column
                      X5 = c(NA, 2, 3, 10, NA), # Numeric column with missing values
                      X6 = factor(c("A", NA, NA, "B", "B"), levels = LETTERS[1:3]))) # Factor with missing values
+```
 
-# Impute missing values and create a missing reference
+Impute missing values and create a missing reference:
+
+```{r}
 (imputedSummary <- missingFix(datNA))
+```
 
-#> X1 and X2 are removed because they are constant (i.e., all values are NA). 
-#> X3 and X4 remain unchanged.
-#> X5 is imputed with the median (3), and a new column X5_FLAG is added to indicate missing values.
-#> X6 is imputed with a new level 'new0_0Level'.
+X1 and X2 are removed because they are constant (i.e., all values are NA). X3 and X4 remain unchanged. X5 is imputed with the median (3), and a new column X5_FLAG is added to indicate missing values. X6 is imputed with a new level 'new0_0Level'.
 
-# Create a new dataset for prediction with some differences
+Now, let's create a new dataset for imputation.
+
+```{r}
 (datNAnew <- data.frame(X1 = 1:3, # New column not in the reference
                         X3 = 1:3, # Matching column with no NAs
                         X4 = as.factor(c("E", "F", NA)), # Factor with a new level "F" and missing values
                         X5 = c(NA, 2, 3))) # Numeric column with a missing value
+```
 
-# Apply the missing reference to the new dataset
+Apply the missing reference to the new dataset:
+
+```{r}
 getDataInShape(datNAnew, imputedSummary$ref)
-
-#> X1 is removed because it does not exist in the missing reference.
-#> X3 remains unchanged.
-#> "F" is a new level in X4, so it is removed and imputed with "A" (the most frequent level) along with other missing values.
-#> X5 is imputed, and a new column X5_FLAG is added to indicate missing values.
-#> X6 is missing from the new data, so it is initialized with the level "new0_0Level".
 ```
 
-Next, we show an example using `folda` with the airquality dataset.
+X1 is removed because it does not exist in the missing reference. X3 remains unchanged. "F" is a new level in X4, so it is removed and imputed with "A" (the most frequent level) along with other missing values. X5 is imputed, and a new column X5_FLAG is added to indicate missing values. X6 is missing from the new data, so it is initialized with the level "new0_0Level".
 
-```{r, fig.asp=0.618,out.width = "70%",fig.align = "center"}
-# Check which columns in airquality have missing values
+Next, we show an example using `folda` with the airquality dataset. First, let's check which columns in airquality have missing values:
+
+```{r}
 sapply(airquality, anyNA) # Ozone and Solar.R have NAs
-
-# Our response variable is the 5th column (Month)
-fitAir <- folda(airquality[, -5], airquality[, 5])
-
-fitAir$misReference # the missing reference
-
-predict(fitAir, data.frame(rep(NA, 4)))
-
-#> No issues arise while predicting, even when the new data contains all missing values.
 ```
+
+Our response variable is the 5th column (Month):
+```{r}
+fitAir <- folda(airquality[, -5], airquality[, 5])
+```
+
+The generated missing reference is:
+```{r}
+fitAir$misReference
+```
+
+To make prediction:
+```{r}
+predict(fitAir, data.frame(rep(NA, 4)))
+```
+
+Notice that no issues arise during predicting, even when the new data contains nothing but missing values.
 
 
 # Additional Features
@@ -179,32 +186,37 @@ predict(fitAir, data.frame(rep(NA, 4)))
 
 * **`misClassCost`**: This parameter is useful in situations where misclassifying certain classes has a more severe impact compared to others. Below is an example demonstrating how to incorporate different misclassification costs.
 
-```{r, fig.asp=0.618, out.width = "70%", fig.align = "center"}
-#> The iris dataset is a famous dataset with three species of flowers
-table(iris$Species)
+The iris dataset is a famous dataset with three species of flowers:
 
-#> Suppose misclassifying versicolor into other species is very costly.
-#> A potential misclassification cost matrix might look like this:
+```{r}
+table(iris$Species, dnn = NULL)
+```
+
+Suppose misclassifying versicolor into other species is very costly. A potential misclassification cost matrix might look like this:
+```{r}
 misClassCost <- matrix(c(0, 100, 1,
                          1, 0, 1,
                          1, 100, 0), 3, 3, byrow = TRUE)
-
-#> This means that misclassifying versicolor to other species is 100 times
-#> more severe than misclassifying other species to versicolor.
-
-# Fit the model with equal misclassification costs
-fitEqualCost <- folda(iris[, -5], response = iris[, 5])
-
-# Fit the model with the specified misclassification costs
-fitNewCost <- folda(iris[, -5], response = iris[, 5], misClassCost = misClassCost)
-
-# Compare the prediction distributions with equal and unequal misclassification costs
-table(predict(fitEqualCost, iris))  # Prediction distribution with equal costs
-table(predict(fitNewCost, iris))    # Prediction distribution with custom costs
-
-#> As shown, the model tends to predict versicolor more often due to the higher
-#> misclassification cost associated with predicting it incorrectly.
 ```
+
+This means that misclassifying versicolor to other species is 100 times more severe than misclassifying other species to versicolor. First, let's fit the model with equal misclassification costs and specified misclassification costs:
+```{r}
+fitEqualCost <- folda(iris[, -5], response = iris[, 5])
+fitNewCost <- folda(iris[, -5], response = iris[, 5], misClassCost = misClassCost)
+```
+
+The prediction distributions with equal misclassification costs:
+```{r}
+table(predict(fitEqualCost, iris), dnn = NULL)
+```
+
+The prediction distributions with specified misclassification costs:
+
+```{r}
+table(predict(fitNewCost, iris), dnn = NULL)
+```
+
+As shown, the model tends to predict versicolor more often due to the higher misclassification cost associated with predicting it incorrectly.
 
 
 # References

@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# folda <a href="http://iamwangsiyu.com/folda/"><img src="man/figures/logo.png" align="right" height="254" alt="folda website" /></a>
+# folda <a href="http://iamwangsiyu.com/folda/"><img src="man/figures/logo.png" align="right" height="139" alt="folda website" /></a>
 
 <!-- badges: start -->
 
@@ -15,21 +15,17 @@ Stepwise Linear Discriminant Analysis (LDA) and Uncorrelated Linear
 Discriminant Analysis (ULDA). If you’re unfamiliar with stepwise LDA or
 ULDA, please refer to the following resources:
 
-For stepwise LDA using Wilks’ Lambda, see:
+- For stepwise LDA using Wilks’ Lambda, see Section 6.11.1 in *Methods
+  of Multivariate Analysis, Third Edition* by Alvin C. Rencher and
+  William F. Christensen (2012).
 
-- Section 6.11.1 in *Methods of Multivariate Analysis, Third Edition* by
-  Alvin C. Rencher and William F. Christensen (2012).
-
-For ULDA, refer to:
-
-- Ye, J., & Yu, B. (2005). *Characterization of a family of algorithms
-  for generalized discriminant analysis on undersampled problems.*
-  Journal of Machine Learning Research, 6(4).
+- For ULDA, refer to Ye, J., & Yu, B. (2005). *Characterization of a
+  family of algorithms for generalized discriminant analysis on
+  undersampled problems.* Journal of Machine Learning Research, 6(4).
   [Link](https://www.jmlr.org/papers/volume6/ye05a/ye05a.pdf).
 
-For a combination of ULDA and forward LDA using Pillai’s trace, see:
-
-- Wang, S. (2024). *A New Forward Discriminant Analysis Framework Based
+- For a combination of ULDA and forward LDA using Pillai’s trace, see
+  Wang, S. (2024). *A New Forward Discriminant Analysis Framework Based
   on Pillai’s Trace and ULDA*. arXiv preprint arXiv:2409.03136.
   [Link](https://arxiv.org/abs/2409.03136).
 
@@ -90,18 +86,21 @@ advantages over the classical framework:
 
 ``` r
 library(folda)
-
-mpg <- as.data.frame(ggplot2::mpg)
+mpg <- as.data.frame(ggplot2::mpg) # Prepare the data
 datX <- mpg[, -5] # All predictors without Y
 response <- mpg[, 5] # we try to predict "cyl" (number of cylinders)
+```
 
-# build a ULDA model with all variables
+Build a ULDA model with all variables:
+
+``` r
 fit <- folda(datX = datX, response = response, subsetMethod = "all")
+```
 
-# build a ULDA model with forward selection via Pillai's trace
+Build a ULDA model with forward selection via Pillai’s trace:
+
+``` r
 fit <- folda(datX = datX, response = response, subsetMethod = "forward", testStat = "Pillai")
-
-# print the results
 print(fit) # 6 out of 11 variables are selected, displ is the most important among them
 #> 
 #> Overall Pillai's trace: 1.325
@@ -134,16 +133,19 @@ print(fit) # 6 out of 11 variables are selected, displ is the most important amo
 #> 4 modelcaravan 2wd    1.210165 0.06851331 0.05363507
 #> 5     classmidsize    1.263449 0.05328468 0.05276500
 #> 6              cty    1.325255 0.06180560 0.05194279
+```
 
-# plot the results
+Plot the results:
+
+``` r
 plot(fit, datX = datX, response = response)
 ```
 
-<img src="man/figures/README-unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" />
+
+Make predictions:
 
 ``` r
-
-# make predictions
 head(predict(fit, datX, type = "response"))
 #> [1] "4" "4" "4" "4" "6" "4"
 head(predict(fit, datX, type = "prob")) # Posterior probabilities
@@ -158,6 +160,17 @@ head(predict(fit, datX, type = "prob")) # Posterior probabilities
 
 More examples can be found in the
 [vignette](https://iamwangsiyu.com/folda/articles/folda.html).
+
+## References
+
+- Howland, P., Jeon, M., & Park, H. (2003). *Structure preserving
+  dimension reduction for clustered text data based on the generalized
+  singular value decomposition*. SIAM Journal on Matrix Analysis and
+  Applications, 25(1), 165-179.
+  [Link](https://epubs.siam.org/doi/10.1137/S0895479802405638).
+
+- Rencher, A. C., & Christensen, W. F. (2002). *Methods of multivariate
+  analysis* (Vol. 727). John Wiley & Sons.
 
 ## Getting help
 
