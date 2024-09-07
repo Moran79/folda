@@ -63,17 +63,10 @@
 <!-- badges: start -->
 
 <p>The <code>folda</code> package is an R modeling tool designed for fitting Forward Stepwise Linear Discriminant Analysis (LDA) and Uncorrelated Linear Discriminant Analysis (ULDA). If you’re unfamiliar with stepwise LDA or ULDA, please refer to the following resources:</p>
-<p>For stepwise LDA using Wilks’ Lambda, see:</p>
 <ul>
-<li>Section 6.11.1 in <em>Methods of Multivariate Analysis, Third Edition</em> by Alvin C. Rencher and William F. Christensen (2012).</li>
-</ul>
-<p>For ULDA, refer to:</p>
-<ul>
-<li>Ye, J., &amp; Yu, B. (2005). <em>Characterization of a family of algorithms for generalized discriminant analysis on undersampled problems.</em> Journal of Machine Learning Research, 6(4). <a href="https://www.jmlr.org/papers/volume6/ye05a/ye05a.pdf" class="external-link">Link</a>.</li>
-</ul>
-<p>For a combination of ULDA and forward LDA using Pillai’s trace, see:</p>
-<ul>
-<li>Wang, S. (2024). <em>A New Forward Discriminant Analysis Framework Based on Pillai’s Trace and ULDA</em>. arXiv preprint arXiv:2409.03136. <a href="https://arxiv.org/abs/2409.03136" class="external-link">Link</a>.</li>
+<li><p>For stepwise LDA using Wilks’ Lambda, see Section 6.11.1 in <em>Methods of Multivariate Analysis, Third Edition</em> by Alvin C. Rencher and William F. Christensen (2012).</p></li>
+<li><p>For ULDA, refer to Ye, J., &amp; Yu, B. (2005). <em>Characterization of a family of algorithms for generalized discriminant analysis on undersampled problems.</em> Journal of Machine Learning Research, 6(4). <a href="https://www.jmlr.org/papers/volume6/ye05a/ye05a.pdf" class="external-link">Link</a>.</p></li>
+<li><p>For a combination of ULDA and forward LDA using Pillai’s trace, see Wang, S. (2024). <em>A New Forward Discriminant Analysis Framework Based on Pillai’s Trace and ULDA</em>. arXiv preprint arXiv:2409.03136. <a href="https://arxiv.org/abs/2409.03136" class="external-link">Link</a>.</p></li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -106,18 +99,15 @@
 </h2>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Moran79/folda" class="external-link">folda</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">mpg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="va"><a href="https://ggplot2.tidyverse.org/reference/mpg.html" class="external-link">mpg</a></span><span class="op">)</span></span>
+<span><span class="va">mpg</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="va"><a href="https://ggplot2.tidyverse.org/reference/mpg.html" class="external-link">mpg</a></span><span class="op">)</span> <span class="co"># Prepare the data</span></span>
 <span><span class="va">datX</span> <span class="op">&lt;-</span> <span class="va">mpg</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span> <span class="co"># All predictors without Y</span></span>
-<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span> <span class="co"># we try to predict "cyl" (number of cylinders)</span></span>
-<span></span>
-<span><span class="co"># build a ULDA model with all variables</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/folda.html">folda</a></span><span class="op">(</span>datX <span class="op">=</span> <span class="va">datX</span>, response <span class="op">=</span> <span class="va">response</span>, subsetMethod <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># build a ULDA model with forward selection via Pillai's trace</span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/folda.html">folda</a></span><span class="op">(</span>datX <span class="op">=</span> <span class="va">datX</span>, response <span class="op">=</span> <span class="va">response</span>, subsetMethod <span class="op">=</span> <span class="st">"forward"</span>, testStat <span class="op">=</span> <span class="st">"Pillai"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># print the results</span></span>
+<span><span class="va">response</span> <span class="op">&lt;-</span> <span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span> <span class="co"># we try to predict "cyl" (number of cylinders)</span></span></code></pre></div>
+<p>Build a ULDA model with all variables:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/folda.html">folda</a></span><span class="op">(</span>datX <span class="op">=</span> <span class="va">datX</span>, response <span class="op">=</span> <span class="va">response</span>, subsetMethod <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
+<p>Build a ULDA model with forward selection via Pillai’s trace:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/folda.html">folda</a></span><span class="op">(</span>datX <span class="op">=</span> <span class="va">datX</span>, response <span class="op">=</span> <span class="va">response</span>, subsetMethod <span class="op">=</span> <span class="st">"forward"</span>, testStat <span class="op">=</span> <span class="st">"Pillai"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">fit</span><span class="op">)</span> <span class="co"># 6 out of 11 variables are selected, displ is the most important among them</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; Overall Pillai's trace: 1.325</span></span>
@@ -149,15 +139,14 @@
 <span><span class="co">#&gt; 3       modeljetta    1.141651 0.11172064 0.05496185</span></span>
 <span><span class="co">#&gt; 4 modelcaravan 2wd    1.210165 0.06851331 0.05363507</span></span>
 <span><span class="co">#&gt; 5     classmidsize    1.263449 0.05328468 0.05276500</span></span>
-<span><span class="co">#&gt; 6              cty    1.325255 0.06180560 0.05194279</span></span>
-<span></span>
-<span><span class="co"># plot the results</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, datX <span class="op">=</span> <span class="va">datX</span>, response <span class="op">=</span> <span class="va">response</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-2-1.png" width="70%" style="display: block; margin: auto;"></p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="co"># make predictions</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">datX</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; 6              cty    1.325255 0.06180560 0.05194279</span></span></code></pre></div>
+<p>Plot the results:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, datX <span class="op">=</span> <span class="va">datX</span>, response <span class="op">=</span> <span class="va">response</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;"></p>
+<p>Make predictions:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">datX</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "4" "4" "4" "4" "6" "4"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">datX</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Posterior probabilities</span></span>
 <span><span class="co">#&gt;           4            5            6            8</span></span>
@@ -168,6 +157,14 @@
 <span><span class="co">#&gt; 5 0.3122116 6.809673e-07 0.6877815595 6.173116e-06</span></span>
 <span><span class="co">#&gt; 6 0.5995781 4.275271e-07 0.4004193019 2.123291e-06</span></span></code></pre></div>
 <p>More examples can be found in the <a href="https://iamwangsiyu.com/folda/articles/folda.html" class="external-link">vignette</a>.</p>
+</div>
+<div class="section level2">
+<h2 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h2>
+<ul>
+<li><p>Howland, P., Jeon, M., &amp; Park, H. (2003). <em>Structure preserving dimension reduction for clustered text data based on the generalized singular value decomposition</em>. SIAM Journal on Matrix Analysis and Applications, 25(1), 165-179. <a href="https://epubs.siam.org/doi/10.1137/S0895479802405638" class="external-link">Link</a>.</p></li>
+<li><p>Rencher, A. C., &amp; Christensen, W. F. (2002). <em>Methods of multivariate analysis</em> (Vol. 727). John Wiley &amp; Sons.</p></li>
+</ul>
 </div>
 <div class="section level2">
 <h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
