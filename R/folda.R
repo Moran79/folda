@@ -22,9 +22,11 @@
 #' @param prior A numeric vector representing the prior probabilities for each
 #'   class in the response variable. If `NULL`, the observed class frequencies
 #'   are used as the prior. Default is `NULL`.
-#' @param misClassCost A square matrix representing the misclassification costs
-#'   for each pair of classes. If `NULL`, a default matrix with equal costs is
-#'   used. Default is `NULL`.
+#' @param misClassCost A square matrix \eqn{C}, where each element \eqn{C_{ij}}
+#'   represents the cost of classifying an observation into class \eqn{i} given
+#'   that it truly belongs to class \eqn{j}. If `NULL`, a default matrix with
+#'   equal misclassification costs for all class pairs is used. Default is
+#'   `NULL`.
 #' @param missingMethod A character vector of length 2 specifying how to handle
 #'   missing values for numerical and categorical variables, respectively.
 #'   Default is `c("medianFlag", "newLevel")`.
@@ -54,14 +56,14 @@
 #'
 #' @export
 #'
-#' @references Ye, J., Janardan, R., Park, C. H., & Park, H. (2004). \emph{An
-#'   optimization criterion for generalized discriminant analysis on
-#'   undersampled problems}. IEEE Transactions on Pattern Analysis and Machine
-#'   Intelligence
+#' @references Howland, P., Jeon, M., & Park, H. (2003). \emph{Structure
+#'   preserving dimension reduction for clustered text data based on the
+#'   generalized singular value decomposition}. SIAM Journal on Matrix Analysis
+#'   and Applications
 #'
-#'   Howland, P., Jeon, M., & Park, H. (2003). \emph{Structure preserving dimension
-#'   reduction for clustered text data based on the generalized singular value
-#'   decomposition}. SIAM Journal on Matrix Analysis and Applications
+#'   Wang, S. (2024). A New Forward Discriminant Analysis Framework Based On
+#'   Pillai's Trace and ULDA. \emph{arXiv preprint arXiv:2409.03136}. Available
+#'   at \url{https://arxiv.org/abs/2409.03136}.
 #'
 #' @examples
 #' # Fit the ULDA model
@@ -101,9 +103,9 @@ folda <- function(datX,
 
   # Pre-processing: Data Transformation -----------------------------------------------
 
-  modelFrame <- model.frame(formula = ~.-1, datX, na.action = "na.fail")
-  Terms <- terms(modelFrame)
-  m <- scale(model.matrix(Terms, modelFrame)) # constant cols would be changed to NaN in this step
+  modelFrame <- stats::model.frame(formula = ~.-1, datX, na.action = "na.fail")
+  Terms <- stats::terms(modelFrame)
+  m <- scale(stats::model.matrix(Terms, modelFrame)) # constant cols would be changed to NaN in this step
   currentVarList <- seq_len(ncol(m))
 
   # Forward Selection -----------------------------------------------
@@ -119,9 +121,9 @@ folda <- function(datX,
     if(length(forwardRes$currentVarList) != 0){
       # modify the design matrix to make it more compact
       selectedVarRawIdx <- unique(sort(attributes(m)$assign[forwardRes$currentVarList]))
-      modelFrame <- model.frame(formula = ~.-1, datX[, selectedVarRawIdx, drop = FALSE], na.action = "na.fail")
-      Terms <- terms(modelFrame)
-      m <- scale(model.matrix(Terms, modelFrame))
+      modelFrame <- stats::model.frame(formula = ~.-1, datX[, selectedVarRawIdx, drop = FALSE], na.action = "na.fail")
+      Terms <- stats::terms(modelFrame)
+      m <- scale(stats::model.matrix(Terms, modelFrame))
       currentVarList <- which(colnames(m) %in% forwardRes$forwardInfo$var)
     }
   }
@@ -159,11 +161,11 @@ folda <- function(datX,
 
   statPillai <- sum(fitSVDp$d[seq_len(rankAll)]^2)
   p <- rankT; s <- rankAll; numF <- N - J - p + s; denF <- abs(p - J + 1) + s
-  pValue <- ifelse(numF > 0, pbeta(1 - statPillai / s, shape1 = numF * s / 2, shape2 = denF * s / 2), 0)
+  pValue <- ifelse(numF > 0, stats::pbeta(1 - statPillai / s, shape1 = numF * s / 2, shape2 = denF * s / 2), 0)
 
   res <- list(scaling = scalingFinal, groupMeans = groupMeans, prior = priorAndMisClassCost$prior,
               misClassCost = priorAndMisClassCost$misClassCost, misReference = imputedSummary$ref,
-              terms = Terms, xlevels = .getXlevels(Terms, modelFrame), varIdx = currentVarList,
+              terms = Terms, xlevels = stats::.getXlevels(Terms, modelFrame), varIdx = currentVarList,
               varSD = varSD, varCenter = varCenter, statPillai = statPillai, pValue = pValue)
 
   if(subsetMethod == "forward"){
@@ -172,7 +174,7 @@ folda <- function(datX,
   }
 
   class(res) <- "ULDA"
-  pred <- predict(res, datX)
+  pred <- factor(stats::predict(res, datX), levels = levels(response))
   res$predGini <- 1 - sum(unname(table(pred) / dim(datX)[1])^2)
   res$confusionMatrix <- table(Predicted = pred, Actual = response)
   return(res)

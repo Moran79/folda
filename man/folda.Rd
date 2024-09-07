@@ -42,9 +42,11 @@ level for the test statistic during forward selection. Default is 0.1.}
 class in the response variable. If \code{NULL}, the observed class frequencies
 are used as the prior. Default is \code{NULL}.}
 
-\item{misClassCost}{A square matrix representing the misclassification costs
-for each pair of classes. If \code{NULL}, a default matrix with equal costs is
-used. Default is \code{NULL}.}
+\item{misClassCost}{A square matrix \eqn{C}, where each element \eqn{C_{ij}}
+represents the cost of classifying an observation into class \eqn{i} given
+that it truly belongs to class \eqn{j}. If \code{NULL}, a default matrix with
+equal misclassification costs for all class pairs is used. Default is
+\code{NULL}.}
 
 \item{missingMethod}{A character vector of length 2 specifying how to handle
 missing values for numerical and categorical variables, respectively.
@@ -91,12 +93,12 @@ fit <- folda(datX = iris[, -5], response = iris[, 5], subsetMethod = "all")
 fit <- folda(datX = iris[, -5], response = iris[, 5], subsetMethod = "forward")
 }
 \references{
-Ye, J., Janardan, R., Park, C. H., & Park, H. (2004). \emph{An
-optimization criterion for generalized discriminant analysis on
-undersampled problems}. IEEE Transactions on Pattern Analysis and Machine
-Intelligence
+Howland, P., Jeon, M., & Park, H. (2003). \emph{Structure
+preserving dimension reduction for clustered text data based on the
+generalized singular value decomposition}. SIAM Journal on Matrix Analysis
+and Applications
 
-Howland, P., Jeon, M., & Park, H. (2003). \emph{Structure preserving dimension
-reduction for clustered text data based on the generalized singular value
-decomposition}. SIAM Journal on Matrix Analysis and Applications
+Wang, S. (2024). A New Forward Discriminant Analysis Framework Based On
+Pillai's Trace and ULDA. \emph{arXiv preprint arXiv:2409.03136}. Available
+at \url{https://arxiv.org/abs/2409.03136}.
 }

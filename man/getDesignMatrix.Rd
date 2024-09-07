@@ -17,6 +17,12 @@ create the design matrix.}
 based on the mean and standard deviation of the variables (default is
 \code{FALSE}).}
 }
+\value{
+A design matrix where each row corresponds to an observation and
+each column to a predictor variable. If \code{scale = TRUE}, the variables are
+centered and scaled based on the means and standard deviations provided in
+the LDA model object.
+}
 \description{
 Generate the Design Matrix for LDA Model
 }

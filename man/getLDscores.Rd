@@ -16,6 +16,12 @@ compute the linear discriminant scores.}
 \item{nScores}{An integer specifying the number of discriminant scores to
 compute. If \code{-1} (default), all scores are computed.}
 }
+\value{
+A matrix of linear discriminant scores, where rows correspond to
+observations and columns correspond to the computed discriminant scores.
+If \code{nScores > 0}, only the specified number of scores is returned; otherwise,
+all scores are computed and returned.
+}
 \description{
 Compute Linear Discriminant Scores
 }

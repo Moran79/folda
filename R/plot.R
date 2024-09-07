@@ -5,7 +5,7 @@
 #' density plot is created. Otherwise, a scatter plot with decision boundaries
 #' is generated.
 #'
-#' @param object A fitted ULDA model object.
+#' @param x A fitted ULDA model object.
 #' @param datX A data frame containing the predictor variables.
 #' @param response A factor representing the response variable (training labels)
 #'   corresponding to `datX`.
@@ -17,51 +17,52 @@
 #' @export
 #'
 #' @examples
-#' # Assuming you have a fitted ULDA model object `model`
 #' fit <- folda(datX = iris[, -5], response = iris[, 5], subsetMethod = "all")
 #' plot(fit, iris[, -5], iris[, 5])
 
-plot.ULDA <- function(object, datX, response, ...){
+plot.ULDA <- function(x, datX, response, ...){
 
-  predictInternal <- function(object, LDscores){ # predict class based on LDscores
-    object$groupMeans <- object$groupMeans[, seq_len(ncol(LDscores)), drop = FALSE]
+  LD1 <- LD2 <- Y <- density <- NULL
+
+  predictInternal <- function(x, LDscores){ # predict class based on LDscores
+    x$groupMeans <- x$groupMeans[, seq_len(ncol(LDscores)), drop = FALSE]
     LDscores <- as.matrix(LDscores)
-    loglikelihood <- LDscores %*% t(object$groupMeans) + matrix(log(object$prior) - 0.5 * rowSums(object$groupMeans^2), nrow(LDscores), length(object$prior), byrow = TRUE)
+    loglikelihood <- LDscores %*% t(x$groupMeans) + matrix(log(x$prior) - 0.5 * rowSums(x$groupMeans^2), nrow(LDscores), length(x$prior), byrow = TRUE)
     likelihood <- exp(loglikelihood - apply(loglikelihood, 1, max))
     posterior <- likelihood / apply(likelihood, 1, sum)
-    return(rownames(object$groupMeans)[max.col(-posterior %*% t(object$misClassCost), ties.method = "first")])
+    return(rownames(x$groupMeans)[max.col(-posterior %*% t(x$misClassCost), ties.method = "first")])
   }
 
   if(missing(datX) || missing(response)) stop("Please input the training X and Y for plotting")
   response <- droplevels(as.factor(response))
-  if(!identical(object$misClassCost, checkPriorAndMisClassCost(NULL, NULL, response)$misClassCost))
+  if(!identical(x$misClassCost, checkPriorAndMisClassCost(NULL, NULL, response)$misClassCost))
     warning("With customized misClassCost, plot may not reflect real decision boundaries")
-  LDscores <- getLDscores(modelLDA = object, data = datX, nScores = min(2, ncol(object$scaling)))
+  LDscores <- getLDscores(modelLDA = x, data = datX, nScores = min(2, ncol(x$scaling)))
   datPlot <- cbind.data.frame(response = response, LDscores)
 
-  if(dim(object$scaling)[2] == 1){ # Only one LD is available, draw the histogram
+  if(dim(x$scaling)[2] == 1){ # Only one LD is available, draw the histogram
     estimatedPrior <- table(response, dnn = NULL) / length(response)
-    datPlot <- do.call(rbind, lapply(seq_along(estimatedPrior), function(i) cbind(with(density(datPlot$LD1[response == names(estimatedPrior)[i]]), data.frame(LD1 = x, density = y * estimatedPrior[i])), response = names(estimatedPrior)[i])))
-    positionX <- as.vector(-diff(log(object$prior) - 0.5 * rowSums(object$groupMeans^2)) / diff(object$groupMeans))
+    datPlot <- do.call(rbind, lapply(seq_along(estimatedPrior), function(i) cbind(with(stats::density(datPlot$LD1[response == names(estimatedPrior)[i]]), data.frame(LD1 = x, density = y * estimatedPrior[i])), response = names(estimatedPrior)[i])))
+    positionX <- as.vector(-diff(log(x$prior) - 0.5 * rowSums(x$groupMeans^2)) / diff(x$groupMeans))
     positionY <- max(datPlot$density) - 0.1
     p <- ggplot2::ggplot(data = datPlot)+
       ggplot2::geom_ribbon(ggplot2::aes(x = LD1, ymin = 0, ymax = density, fill = response), alpha = 0.8)+
-      ggplot2::geom_vline(xintercept = positionX, color = hcl.colors(3)[2])+
+      ggplot2::geom_vline(xintercept = positionX, color = grDevices::hcl.colors(3)[2])+
       ggplot2::geom_label(x = positionX, y = positionY, label = "Decision\nBoundary")+
-      ggplot2::scale_fill_manual(values = hcl.colors(3)[c(1,3)])+
+      ggplot2::scale_fill_manual(values = grDevices::hcl.colors(3)[c(1,3)])+
       ggplot2::labs(title = "Density plot of the first linear discriminant score")+
       ggplot2::theme_bw()
   } else{
     LDranges <- apply(LDscores, 2, range)
     fakeLDs <- expand.grid(list(LD1 = seq(from = LDranges[1,1], to = LDranges[2,1], length.out = 100),
                                 LD2 = seq(from = LDranges[1,2], to = LDranges[2,2], length.out = 100)))
-    fakeLDs$Y <- factor(predictInternal(object = object, LDscores = fakeLDs), levels = levels(response))
+    fakeLDs$Y <- factor(predictInternal(x = x, LDscores = fakeLDs), levels = levels(response))
     p <- ggplot2::ggplot(data = datPlot)+
       ggplot2::geom_raster(data = fakeLDs, ggplot2::aes(x = LD1, y = LD2, fill = Y), alpha = 0.4, show.legend = FALSE)+
       ggplot2::geom_point(ggplot2::aes(x = LD1, y = LD2, color = response), alpha = 0.5)+
       ggplot2::geom_contour(data = fakeLDs, ggplot2::aes(x = LD1, y = LD2, z = as.integer(Y)), color = "white", linetype = "dotted")+
-      ggplot2::scale_color_manual(values = hcl.colors(nlevels(response)))+
-      ggplot2::scale_fill_manual(values = hcl.colors(nlevels(response)))+
+      ggplot2::scale_color_manual(values = grDevices::hcl.colors(nlevels(response)))+
+      ggplot2::scale_fill_manual(values = grDevices::hcl.colors(nlevels(response)))+
       ggplot2::labs(title = "Scatter plot of the first two linear discriminant scores")+
       ggplot2::theme_bw()
   }
@@ -70,26 +71,26 @@ plot.ULDA <- function(object, datX, response, ...){
 
 
 #' @export
-print.ULDA <- function(object, ...) {
-  cat("\nOverall Pillai's trace: ", format(object$statPillai, digits = 4), "\n", sep = "")
-  cat("Associated p-value: ", format(object$pValue, digits = 4), "\n\n", sep = "")
+print.ULDA <- function(x, ...) {
+  cat("\nOverall Pillai's trace: ", format(x$statPillai, digits = 4), "\n", sep = "")
+  cat("Associated p-value: ", format(x$pValue, digits = 4), "\n\n", sep = "")
 
   cat("Prediction Results on Training Data:\n")
-  accuracy <- sum(diag(object$confusionMatrix)) / sum(object$confusionMatrix)
+  accuracy <- sum(diag(x$confusionMatrix)) / sum(x$confusionMatrix)
   cat("Refitting Accuracy: ", format(accuracy, digits = 4), "\n", sep = "")
-  cat("Gini Index: ", format(object$predGini, digits = 4), "\n", sep = "")
+  cat("Gini Index: ", format(x$predGini, digits = 4), "\n", sep = "")
   cat("\nConfusion Matrix:\n")
-  print(object$confusionMatrix)
+  print(x$confusionMatrix)
 
   cat("\nGroup means of LD scores:\n")
-  print(object$groupMeans)
+  print(x$groupMeans)
 
-  if (!is.null(object$forwardInfo)) {
+  if (!is.null(x$forwardInfo)) {
     cat("\nForward Selection Results:\n")
-    print(object$forwardInfo)
+    print(x$forwardInfo)
   }
 
-  invisible(object)
+  invisible(x)
 }
 
 

@@ -73,22 +73,3 @@ test_that("getDataInShape", {
 })
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

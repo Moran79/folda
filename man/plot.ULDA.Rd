@@ -4,10 +4,10 @@
 \alias{plot.ULDA}
 \title{Plot Decision Boundaries and Linear Discriminant Scores}
 \usage{
-\method{plot}{ULDA}(object, datX, response, ...)
+\method{plot}{ULDA}(x, datX, response, ...)
 }
 \arguments{
-\item{object}{A fitted ULDA model object.}
+\item{x}{A fitted ULDA model object.}
 
 \item{datX}{A data frame containing the predictor variables.}
 
@@ -27,7 +27,6 @@ density plot is created. Otherwise, a scatter plot with decision boundaries
 is generated.
 }
 \examples{
-# Assuming you have a fitted ULDA model object `model`
 fit <- folda(datX = iris[, -5], response = iris[, 5], subsetMethod = "all")
 plot(fit, iris[, -5], iris[, 5])
 }

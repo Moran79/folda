@@ -36,3 +36,8 @@ test statistics (\code{Pillai} or \code{Wilks}). It iteratively adds variables t
 contribute the most to the test statistic until no significant variables are
 found or a stopping criterion is met.
 }
+\references{
+Wang, S. (2024). A New Forward Discriminant Analysis Framework
+Based On Pillai's Trace and ULDA. \emph{arXiv preprint arXiv:2409.03136}.
+Available at \url{https://arxiv.org/abs/2409.03136}.
+}

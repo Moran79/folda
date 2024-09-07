@@ -14,6 +14,14 @@ of the columns (if \code{data} is a data frame) or the type of the vector.}
 logical vector indicating which columns are numeric, integer, or logical.
 If \code{TRUE}, it returns the indices of these columns.}
 }
+\value{
+If \code{index = FALSE} (default), the function returns a logical vector
+with one element for each column (or the vector itself), where \code{TRUE}
+indicates that the column is of type numeric, integer, or logical, and
+\code{FALSE} indicates it is not. If \code{index = TRUE}, the function returns an
+integer vector containing the indices of the columns that are numeric,
+integer, or logical.
+}
 \description{
 This function checks whether the columns in a data frame (or a vector) are of
 type numeric, integer, or logical. It can return a logical vector indicating

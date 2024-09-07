@@ -73,10 +73,10 @@ missingFix <- function(data, missingMethod = c("medianFlag", "newLevel")){
                              list(dataNRef[,i], na.rm = TRUE))
     } else{ # categorical vars
 
-      if(class(dataNRef[,i]) == "factor"){
+      if(is.factor(dataNRef[,i])){
         currentLevels <- levels(droplevels(dataNRef[,i])) # drop extra levels
       }else{
-        currentLevels <- sort(unique(na.omit(dataNRef[,i])))
+        currentLevels <- sort(unique(stats::na.omit(dataNRef[,i])))
       }
 
       if(grepl("newLevel", catMethod) & NAorNot[i]){
@@ -91,9 +91,11 @@ missingFix <- function(data, missingMethod = c("medianFlag", "newLevel")){
 
   # remove constant columns after imputation
   dataNRef <- dataNRef[, nonConstInd(data = dataNRef), drop = FALSE]
+  missingRef <- dataNRef[nrow(dataNRef),,drop = FALSE]
+  rownames(missingRef) <- NULL
 
   return(list(data = dataNRef[-nrow(dataNRef),,drop = FALSE],
-              ref = dataNRef[nrow(dataNRef),,drop = FALSE]))
+              ref = missingRef))
 }
 
 
@@ -199,7 +201,7 @@ nonConstInd <- function(data, tol = 1e-8, na.rm = FALSE){
 
   nonConstIndHelper <- function(x, tol){
     if(getNumFlag(x)) x <- round(x, digits = -log(tol, base = 10))
-    if(na.rm) x <- na.omit(x)
+    if(na.rm) x <- stats::na.omit(x)
     return(length(unique(x)) > 1)
   }
 
@@ -259,14 +261,20 @@ getDownSampleInd <- function(response,
 #' @param index A logical value. If `FALSE` (default), the function returns a
 #'   logical vector indicating which columns are numeric, integer, or logical.
 #'   If `TRUE`, it returns the indices of these columns.
+#' @return If `index = FALSE` (default), the function returns a logical vector
+#'   with one element for each column (or the vector itself), where `TRUE`
+#'   indicates that the column is of type numeric, integer, or logical, and
+#'   `FALSE` indicates it is not. If `index = TRUE`, the function returns an
+#'   integer vector containing the indices of the columns that are numeric,
+#'   integer, or logical.
 getNumFlag <- function(data, index = FALSE){
   #> This function should be replaced (or deleted) with caution,
   #> since the function in sapply framework output wrong classes.
-  if(is.null(dim(data))) return(any(class(data) %in% c('numeric', 'integer', 'logical')))
+  if(is.null(dim(data))) return(inherits(data, c("numeric", "integer", "logical")))
 
   if (!is.data.frame(data)) stop("data must be a data.frame")
 
-  numOrNot <- sapply(data, class) %in% c('numeric', 'integer', 'logical')
+  numOrNot <- sapply(data, function(col) inherits(col, c("numeric", "integer", "logical")))
 
   if(index){numOrNot <- which(numOrNot)}
 
@@ -379,6 +387,10 @@ checkPriorAndMisClassCost <- function(prior, misClassCost, response){
 #'   compute the linear discriminant scores.
 #' @param nScores An integer specifying the number of discriminant scores to
 #'   compute. If `-1` (default), all scores are computed.
+#' @return A matrix of linear discriminant scores, where rows correspond to
+#'   observations and columns correspond to the computed discriminant scores.
+#'   If `nScores > 0`, only the specified number of scores is returned; otherwise,
+#'   all scores are computed and returned.
 getLDscores <- function(modelLDA, data, nScores = -1){
   data <- getDataInShape(data = data, missingReference = modelLDA$misReference)
   modelX <- getDesignMatrix(modelLDA = modelLDA, data = data, scale = TRUE)
@@ -400,9 +412,13 @@ getLDscores <- function(modelLDA, data, nScores = -1){
 #' @param scale A logical value indicating whether to scale the design matrix
 #'   based on the mean and standard deviation of the variables (default is
 #'   `FALSE`).
+#' @return A design matrix where each row corresponds to an observation and
+#'   each column to a predictor variable. If `scale = TRUE`, the variables are
+#'   centered and scaled based on the means and standard deviations provided in
+#'   the LDA model object.
 getDesignMatrix <- function(modelLDA, data, scale = FALSE){
-  Terms <- delete.response(modelLDA$terms)
-  modelX <- model.matrix(Terms, data = data, xlev = modelLDA$xlevels)
+  Terms <- stats::delete.response(modelLDA$terms)
+  modelX <- stats::model.matrix(Terms, data = data, xlev = modelLDA$xlevels)
   if(scale){ # Reserved for internal usage from getLDscores
     modelX <- sweep(modelX[, modelLDA$varIdx, drop = FALSE], 2, modelLDA$varCenter, "-")
     modelX <- sweep(modelX, 2, modelLDA$varSD, "/")

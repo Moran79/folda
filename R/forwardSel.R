@@ -22,6 +22,10 @@
 #'   forward selection process, including the selected variables, test
 #'   statistics, and thresholds.} \item{stopInfo}{A character string describing
 #'   why the selection process stopped.}
+#'
+#' @references Wang, S. (2024). A New Forward Discriminant Analysis Framework
+#' Based On Pillai's Trace and ULDA. \emph{arXiv preprint arXiv:2409.03136}.
+#' Available at \url{https://arxiv.org/abs/2409.03136}.
 forwardSel <- function(m,
                        response,
                        testStat = "Pillai",
@@ -55,7 +59,7 @@ forwardSel <- function(m,
   if(correction){
     correctionFactor <- ncol(m) - maxVarSeq
   }else correctionFactor <- 1
-  threshold <- (N - J - maxVarSeq) / (N - J - maxVarSeq + qf(1 - alpha / correctionFactor, df1 = J - 1, N - J - maxVarSeq) * (J - 1))
+  threshold <- (N - J - maxVarSeq) / (N - J - maxVarSeq + stats::qf(1 - alpha / correctionFactor, df1 = J - 1, N - J - maxVarSeq) * (J - 1))
 
   # Main Loop -----------------------------------------------
 
@@ -70,7 +74,7 @@ forwardSel <- function(m,
         break
       }
       correctionFactor <- ifelse(correction, 1 / nCandidates, 1)
-      threshold[p] <- qbeta((1 - alpha)^correctionFactor, shape1 = (Jnow - 1) / 2, shape2 = (N - Jnow) / 2)
+      threshold[p] <- stats::qbeta((1 - alpha)^correctionFactor, shape1 = (Jnow - 1) / 2, shape2 = (N - Jnow) / 2)
     }
 
     bestVarInfo <- getBestVar(currentVar = currentVarList,
