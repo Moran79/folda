@@ -168,7 +168,6 @@ More examples can be found in the
   dimension reduction for clustered text data based on the generalized
   singular value decomposition*. SIAM Journal on Matrix Analysis and
   Applications, 25(1), 165-179.
-  [Link](https://epubs.siam.org/doi/10.1137/S0895479802405638).
 
 - Rencher, A. C., & Christensen, W. F. (2002). *Methods of multivariate
   analysis* (Vol. 727). John Wiley & Sons.
