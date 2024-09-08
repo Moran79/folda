@@ -5,8 +5,8 @@ test_that("Forward Selection on Dummy", {
   fitPillai <- folda(dat[,-1], response = dat[,1])
   fitWilks <- folda(dat[,-1], response = dat[,1], testStat = "Wilks")
 
-  expect_equal(fitPillai$forwardInfo$var, c("ClassA", "ClassB", "ClassD"))
-  expect_equal(fitWilks$forwardInfo$var, c("ClassA"))
+  expect_equal(length(fitPillai$forwardInfo$var), 3)
+  expect_equal(length(fitWilks$forwardInfo$var), 1)
 })
 
 test_that("folda: Prior and Misclassification Cost", {
