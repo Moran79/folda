@@ -21,7 +21,6 @@ Imports:
     ggplot2,
     grDevices,
     Rcpp,
-    RcppEigen,
     stats
 URL: https://github.com/Moran79/folda, http://iamwangsiyu.com/folda/
 BugReports: https://github.com/Moran79/folda/issues
