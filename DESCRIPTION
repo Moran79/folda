@@ -1,6 +1,6 @@
 Package: folda
 Title: Forward Stepwise Discriminant Analysis with Pillai's Trace
-Version: 0.1.0
+Version: 0.0.9
 Authors@R: 
     person(given = "Siyu",
            family = "Wang",
@@ -10,11 +10,9 @@ Authors@R:
 Description: A novel forward stepwise discriminant analysis framework 
     that integrates Pillai’s trace with Uncorrelated Linear Discriminant Analysis (ULDA), 
     providing an improvement over traditional stepwise LDA methods that rely on Wilks' Lambda. 
-    The replacement of Wilks' Lambda with Pillai's trace allows the method to better handle 
-    scenarios involving perfect group separation, where Wilks' Lambda fails. 
-    This model is particularly useful for high-dimensional data where the within-class 
-    scatter matrix is non-invertible. It offers robust feature selection and classification 
-    accuracy.
+    A stand-alone ULDA implementation is also provided, offering a more general solution 
+    than the one available in the 'MASS' package. It automatically handles missing values and 
+    provides visualization tools. For more details, see Wang (2024) <arXiv:2409.03136>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

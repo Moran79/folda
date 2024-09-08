@@ -8,6 +8,7 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/folda)](https://CRAN.R-project.org/package=folda)
 [![R-CMD-check](https://github.com/Moran79/folda/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Moran79/folda/actions/workflows/R-CMD-check.yaml)
+![CRAN Downloads](https://cranlogs.r-pkg.org/badges/grand-total/folda)
 <!-- badges: end -->
 
 The `folda` package is an R modeling tool designed for fitting Forward
