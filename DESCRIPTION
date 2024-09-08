@@ -1,6 +1,6 @@
 Package: folda
 Title: Forward Stepwise Discriminant Analysis with Pillai's Trace
-Version: 0.0.9
+Version: 0.1.0
 Authors@R: 
     person(given = "Siyu",
            family = "Wang",
