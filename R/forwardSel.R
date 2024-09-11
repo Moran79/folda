@@ -41,7 +41,7 @@ forwardSel <- function(m,
   N = nrow(m); J = nlevels(response); p = 0
   currentCandidates <- seq_len(ncol(m)); currentVarList = c()
   statSaved <- numeric(ncol(m) + 1) + ifelse(testStat == "Wilks", 1, 0) # (i+1)-th place saves i-th result
-  statDiff <- numeric(ncol(m)); stopInfo <- "Normal"
+  statDiff <- numeric(ncol(m)); stopInfo <- "All variables are selected"
 
   groupMeans <- tapply(c(m), list(rep(response, dim(m)[2]), col(m)), function(x) mean(x, na.rm = TRUE))
   mW <- m - groupMeans[response, , drop = FALSE]

@@ -8,7 +8,7 @@
 [![CRAN
 status](https://www.r-pkg.org/badges/version/folda)](https://CRAN.R-project.org/package=folda)
 [![R-CMD-check](https://github.com/Moran79/folda/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Moran79/folda/actions/workflows/R-CMD-check.yaml)
-![CRAN Downloads](https://cranlogs.r-pkg.org/badges/grand-total/folda)
+<!-- ![CRAN Downloads](https://cranlogs.r-pkg.org/badges/grand-total/folda) -->
 <!-- badges: end -->
 
 The `folda` package is an R modeling tool designed for fitting Forward
@@ -16,18 +16,18 @@ Stepwise Linear Discriminant Analysis (LDA) and Uncorrelated Linear
 Discriminant Analysis (ULDA). If you’re unfamiliar with stepwise LDA or
 ULDA, please refer to the following resources:
 
-- For stepwise LDA using Wilks’ Lambda, see Section 6.11.1 in *Methods
-  of Multivariate Analysis, Third Edition* by Alvin C. Rencher and
-  William F. Christensen (2012).
+- For **stepwise LDA using Wilks’ Lambda**, see Section 6.11.1 in
+  *Methods of Multivariate Analysis, Third Edition* by Alvin C. Rencher
+  and William F. Christensen (2012).
 
-- For ULDA, refer to Ye, J., & Yu, B. (2005). *Characterization of a
+- For **ULDA**, refer to Ye, J., & Yu, B. (2005). *Characterization of a
   family of algorithms for generalized discriminant analysis on
   undersampled problems.* Journal of Machine Learning Research, 6(4).
   [Link](https://www.jmlr.org/papers/volume6/ye05a/ye05a.pdf).
 
-- For a combination of ULDA and forward LDA using Pillai’s trace, see
-  Wang, S. (2024). *A New Forward Discriminant Analysis Framework Based
-  on Pillai’s Trace and ULDA*. arXiv preprint arXiv:2409.03136.
+- For **a combination of ULDA and forward LDA using Pillai’s trace**,
+  see Wang, S. (2024). *A New Forward Discriminant Analysis Framework
+  Based on Pillai’s Trace and ULDA*. arXiv preprint arXiv:2409.03136.
   [Link](https://arxiv.org/abs/2409.03136).
 
 ## Installation
@@ -36,7 +36,7 @@ ULDA, please refer to the following resources:
 install.packages("LDATree")
 ```
 
-You can install the development version of folda from
+You can install the development version of `folda` from
 [GitHub](https://github.com/) with:
 
 ``` r
@@ -73,8 +73,6 @@ For the forward LDA implementation, `folda` offers the following
 advantages over the classical framework:
 
 - **No issues with multicollinearity or perfect linear dependency!**
-  Since `folda()` is built on ULDA, it effectively solves for the
-  scaling matrix.
 
 - **Handles perfect separation and offers greater power!** The classical
   approach using Wilks’ Lambda has known limitations, including

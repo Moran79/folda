@@ -8,11 +8,11 @@ Authors@R:
            email = "iamwangsiyu@gmail.com",
            comment = c(ORCID = "0009-0005-2098-7089"))
 Description: A novel forward stepwise discriminant analysis framework 
-    that integrates Pillai’s trace with Uncorrelated Linear Discriminant Analysis (ULDA), 
+    that integrates Pillai's trace with Uncorrelated Linear Discriminant Analysis (ULDA), 
     providing an improvement over traditional stepwise LDA methods that rely on Wilks' Lambda. 
     A stand-alone ULDA implementation is also provided, offering a more general solution 
     than the one available in the 'MASS' package. It automatically handles missing values and 
-    provides visualization tools. For more details, see Wang (2024) <arXiv:2409.03136>.
+    provides visualization tools. For more details, see Wang (2024) <doi:10.48550/arXiv.2409.03136>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
