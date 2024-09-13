@@ -53,8 +53,11 @@ missing values for numerical and categorical variables, respectively.
 Default is \code{c("medianFlag", "newLevel")}.}
 
 \item{downSampling}{A logical value indicating whether to perform
-downsampling to balance the class distribution in the training data or
-speed up the program. Default is \code{FALSE}.}
+downsampling to balance the class distribution in the training data or to
+improve computational efficiency. Default is \code{FALSE}. Note that if
+downsampling is applied and the \code{prior} is \code{NULL}, the class prior will be
+calculated based on the downsampled data. To retain the original prior,
+please specify it explicitly using the \code{prior} parameter.}
 
 \item{kSample}{An integer specifying the maximum number of samples to take
 from each class during downsampling. If \code{NULL}, the number of samples is

@@ -31,8 +31,11 @@
 #'   missing values for numerical and categorical variables, respectively.
 #'   Default is `c("medianFlag", "newLevel")`.
 #' @param downSampling A logical value indicating whether to perform
-#'   downsampling to balance the class distribution in the training data or
-#'   speed up the program. Default is `FALSE`.
+#'   downsampling to balance the class distribution in the training data or to
+#'   improve computational efficiency. Default is `FALSE`. Note that if
+#'   downsampling is applied and the `prior` is `NULL`, the class prior will be
+#'   calculated based on the downsampled data. To retain the original prior,
+#'   please specify it explicitly using the `prior` parameter.
 #' @param kSample An integer specifying the maximum number of samples to take
 #'   from each class during downsampling. If `NULL`, the number of samples is
 #'   limited to the size of the smallest class. Default is `NULL`.
