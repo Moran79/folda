@@ -123,8 +123,11 @@ Default is <code>c("medianFlag", "newLevel")</code>.</p></dd>
 
 <dt id="arg-downsampling">downSampling<a class="anchor" aria-label="anchor" href="#arg-downsampling"></a></dt>
 <dd><p>A logical value indicating whether to perform
-downsampling to balance the class distribution in the training data or
-speed up the program. Default is <code>FALSE</code>.</p></dd>
+downsampling to balance the class distribution in the training data or to
+improve computational efficiency. Default is <code>FALSE</code>. Note that if
+downsampling is applied and the <code>prior</code> is <code>NULL</code>, the class prior will be
+calculated based on the downsampled data. To retain the original prior,
+please specify it explicitly using the <code>prior</code> parameter.</p></dd>
 
 
 <dt id="arg-ksample">kSample<a class="anchor" aria-label="anchor" href="#arg-ksample"></a></dt>
