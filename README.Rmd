@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/folda)](https://CRAN.R-project.org/package=folda)
 [![R-CMD-check](https://github.com/Moran79/folda/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Moran79/folda/actions/workflows/R-CMD-check.yaml)
-<!-- ![CRAN Downloads](https://cranlogs.r-pkg.org/badges/grand-total/folda) -->
+![CRAN Downloads](https://cranlogs.r-pkg.org/badges/grand-total/folda)
 <!-- badges: end -->
 
 The `folda` package is an R modeling tool designed for fitting Forward Stepwise Linear Discriminant Analysis (LDA) and Uncorrelated Linear Discriminant Analysis (ULDA). If you're unfamiliar with stepwise LDA or ULDA, please refer to the following resources:
