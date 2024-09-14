@@ -5,8 +5,10 @@
 #' contribute the most to the test statistic until no significant variables are
 #' found or a stopping criterion is met.
 #'
+#' @noRd
+#'
 #' @param m A numeric matrix containing the predictor variables. Rows represent
-#'   observations and columns represent variables.
+#'   observations and columns represent variables. It has to be scaled already!
 #' @param response A factor representing the response variable with multiple
 #'   levels (groups).
 #' @param testStat A character string specifying the test statistic to use. Can
@@ -24,8 +26,8 @@
 #'   why the selection process stopped.}
 #'
 #' @references Wang, S. (2024). A New Forward Discriminant Analysis Framework
-#' Based On Pillai's Trace and ULDA. \emph{arXiv preprint arXiv:2409.03136}.
-#' Available at \url{https://arxiv.org/abs/2409.03136}.
+#'   Based On Pillai's Trace and ULDA. \emph{arXiv preprint arXiv:2409.03136}.
+#'   Available at \url{https://arxiv.org/abs/2409.03136}.
 forwardSel <- function(m,
                        response,
                        testStat = "Pillai",
@@ -131,6 +133,8 @@ forwardSel <- function(m,
 #' candidate variable in `newVar` when combined with `currentVar`, and returns
 #' the index and test statistic of the best variable. It also identifies
 #' collinear variables.
+#'
+#' @noRd
 #'
 #' @param currentVar A numeric vector indicating the indices of currently
 #'   selected variables.

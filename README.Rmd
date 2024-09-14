@@ -34,7 +34,7 @@ The `folda` package is an R modeling tool designed for fitting Forward Stepwise 
 ## Installation
 
 ``` r
-install.packages("LDATree")
+install.packages("folda")
 ```
 
 You can install the development version of `folda` from [GitHub](https://github.com/) with:

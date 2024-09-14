@@ -33,7 +33,7 @@ ULDA, please refer to the following resources:
 ## Installation
 
 ``` r
-install.packages("LDATree")
+install.packages("folda")
 ```
 
 You can install the development version of `folda` from

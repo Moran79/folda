@@ -185,6 +185,8 @@ getDataInShape <- function(data, missingReference){
 
 #' Identify Non-Constant Columns in a Data Frame
 #'
+#' @noRd
+#'
 #' @param data A data frame in which columns will be checked for constant
 #'   values. Columns can be of any type (numeric, integer, logical, or factor).
 #' @param tol A numeric tolerance value (default is `1e-8`) that applies to
@@ -216,6 +218,8 @@ nonConstInd <- function(data, tol = 1e-8, na.rm = FALSE){
 #' This function selects the indices for the training set based on the class
 #' vector `response`. It allows for optional downsampling to balance the class
 #' distribution by limiting the number of samples per class.
+#'
+#' @noRd
 #'
 #' @param response A factor vector representing the class labels.
 #' @param downSampling A logical value indicating whether downsampling should be
@@ -256,6 +260,8 @@ getDownSampleInd <- function(response,
 #' whether each column matches these types, or, if `index = TRUE`, it returns
 #' the indices of the matching columns.
 #'
+#' @noRd
+#'
 #' @param data A data frame or a vector. The function will check the data types
 #'   of the columns (if `data` is a data frame) or the type of the vector.
 #' @param index A logical value. If `FALSE` (default), the function returns a
@@ -283,6 +289,8 @@ getNumFlag <- function(data, index = FALSE){
 
 
 #' Calculate the Mode of a Factor Variable with Optional Priors
+#'
+#' @noRd
 #'
 #' @param v A factor or vector that can be coerced into a factor. The mode will
 #'   be calculated from the levels of this factor.
@@ -318,6 +326,8 @@ getMode <- function(v, prior){
 #' the observed frequencies of the response, and the misclassification cost
 #' matrix is set to 1 for all misclassifications and 0 for correct
 #' classifications.
+#'
+#' @noRd
 #'
 #' @param prior A numeric vector representing the prior probabilities for each
 #'   class in the response variable. If `NULL`, the observed frequencies of the
@@ -381,6 +391,8 @@ checkPriorAndMisClassCost <- function(prior, misClassCost, response){
 
 #' Compute Linear Discriminant Scores
 #'
+#' @noRd
+#'
 #' @param modelLDA A fitted LDA model object containing the scaling matrix and
 #'   the reference structure for missing data.
 #' @param data A data frame containing the predictor variables for which to
@@ -404,6 +416,8 @@ getLDscores <- function(modelLDA, data, nScores = -1){
 
 
 #' Generate the Design Matrix for LDA Model
+#'
+#' @noRd
 #'
 #' @param modelLDA A fitted LDA model object containing the terms, variable
 #'   indices, variable centers, and scaling factors.
