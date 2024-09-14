@@ -33,6 +33,26 @@ plot.ULDA <- function(x, datX, response, ...){
     return(rownames(x$groupMeans)[max.col(-posterior %*% t(x$misClassCost), ties.method = "first")])
   }
 
+  getBoundary1D <- function(prior, groupMeans, xRange, tol = 1e-10){
+    prior <- as.vector(prior); groupMeans <- as.vector(groupMeans)
+    targetNum <- log(prior) - 0.5 * groupMeans^2
+    cutoffCandidates <- c(); cutOffFake <- c()
+
+    for(i in seq_len(length(prior) - 1)){
+      for(j in seq(i+1, length(prior), by = 1)){
+        cutoffCandidates <- c(cutoffCandidates, -diff(targetNum[c(i,j)]) / diff(groupMeans[c(i,j)]))
+      }
+    }
+    cutoffCandidates <- stats::na.omit(cutoffCandidates)
+    cutoffCandidates <- cutoffCandidates[cutoffCandidates >= xRange[1] & cutoffCandidates <= xRange[2]]
+
+    for(cutoff in cutoffCandidates){
+      if(which.max((cutoff + tol) * groupMeans + targetNum) == which.max((cutoff - tol) * groupMeans + targetNum))
+        cutOffFake <- c(cutOffFake, cutoff)
+    }
+    return(setdiff(cutoffCandidates, cutOffFake))
+  }
+
   if(missing(datX) || missing(response)) stop("Please input the training X and Y for plotting")
   response <- droplevels(as.factor(response))
   if(!identical(x$misClassCost, checkPriorAndMisClassCost(NULL, NULL, response)$misClassCost))
@@ -43,14 +63,12 @@ plot.ULDA <- function(x, datX, response, ...){
   if(dim(x$scaling)[2] == 1){ # Only one LD is available, draw the histogram
     estimatedPrior <- table(response, dnn = NULL) / length(response)
     datPlot <- do.call(rbind, lapply(seq_along(estimatedPrior), function(i) cbind(with(stats::density(datPlot$LD1[response == names(estimatedPrior)[i]]), data.frame(LD1 = x, density = y * estimatedPrior[i])), response = names(estimatedPrior)[i])))
-    positionX <- as.vector(-diff(log(x$prior) - 0.5 * rowSums(x$groupMeans^2)) / diff(x$groupMeans))
-    positionY <- max(datPlot$density) - 0.1
+    positionX <- getBoundary1D(prior = x$prior, groupMeans = x$groupMeans, xRange = range(LDscores))
     p <- ggplot2::ggplot(data = datPlot)+
       ggplot2::geom_ribbon(ggplot2::aes(x = LD1, ymin = 0, ymax = density, fill = response), alpha = 0.8)+
-      ggplot2::geom_vline(xintercept = positionX, color = grDevices::hcl.colors(3)[2])+
-      ggplot2::geom_label(x = positionX, y = positionY, label = "Decision\nBoundary")+
-      ggplot2::scale_fill_manual(values = grDevices::hcl.colors(3)[c(1,3)])+
-      ggplot2::labs(title = "Density plot of the first linear discriminant score")+
+      ggplot2::geom_vline(xintercept = positionX, color = "black", linetype = "dotted")+
+      ggplot2::scale_fill_manual(values = grDevices::hcl.colors(nlevels(response)))+
+      ggplot2::labs(title = "Density plot of the first linear discriminant score", subtitle = "Dotted line is the decision boundary")+
       ggplot2::theme_bw()
   } else{
     LDranges <- apply(LDscores, 2, range)
