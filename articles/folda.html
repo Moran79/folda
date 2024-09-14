@@ -360,6 +360,75 @@ values:</p>
 contains nothing but missing values.</p>
 </div>
 <div class="section level2">
+<h2 id="downsampling">Downsampling<a class="anchor" aria-label="anchor" href="#downsampling"></a>
+</h2>
+<p>There are two common scenarios where downsampling can be helpful:</p>
+<ol style="list-style-type: decimal">
+<li><p>The classes are highly imbalanced, and downsampling can make them
+more balanced.</p></li>
+<li><p><strong>To speed up computation</strong>. The ULDA classifier is
+computed based on class centroids and the covariance structure. Once a
+sufficient number of data points, such as 3000, are included, additional
+data points <strong>may</strong> have minimal impact.</p></li>
+</ol>
+<p>By default, <code>downsampling</code> is disabled. If
+<code>downsampling = TRUE</code> and <code>kSample = NULL</code>, it
+will downsample all classes to the size of the smallest class. If
+<code>kSample</code> is specified, all classes will be downsampled to
+have a maximum of <code>kSample</code> samples. An if a class contains
+fewer than <code>kSample</code> samples, all observations from that
+class will be retained.</p>
+<p>Suppose we want to predict the number of cylinders (<code>cyl</code>)
+in a car. The number of observations in each class is:</p>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">$</span><span class="va">cyl</span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;  4  5  6  8 </span></span>
+<span><span class="co">#&gt; 81  4 79 70</span></span></code></pre></div>
+<p>If we apply downsampling without specifying <code>kSample</code>, we
+will randomly select 4 samples from each group, as the smallest group
+(<code>cyl = 5</code>) has only 4 observations.</p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">443</span><span class="op">)</span></span>
+<span><span class="va">fitCyl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, <span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span>, downSampling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">fitCyl</span><span class="op">$</span><span class="va">confusionMatrix</span></span>
+<span><span class="co">#&gt;          Actual</span></span>
+<span><span class="co">#&gt; Predicted 4 5 6 8</span></span>
+<span><span class="co">#&gt;         4 4 0 0 0</span></span>
+<span><span class="co">#&gt;         5 0 4 0 0</span></span>
+<span><span class="co">#&gt;         6 0 0 4 0</span></span>
+<span><span class="co">#&gt;         8 0 0 0 4</span></span></code></pre></div>
+<p>We can also set <code>kSample = 30</code>. In this case, 30 random
+samples will be selected from <code>cyl = 4, 6, 8</code>, while 4
+samples will be chosen from <code>cyl = 5</code>.</p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fitCyl30</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, <span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span>, downSampling <span class="op">=</span> <span class="cn">TRUE</span>, kSample <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
+<span><span class="va">fitCyl30</span><span class="op">$</span><span class="va">confusionMatrix</span></span>
+<span><span class="co">#&gt;          Actual</span></span>
+<span><span class="co">#&gt; Predicted  4  5  6  8</span></span>
+<span><span class="co">#&gt;         4 22  0  3  0</span></span>
+<span><span class="co">#&gt;         5  8  4  2  0</span></span>
+<span><span class="co">#&gt;         6  0  0 25  2</span></span>
+<span><span class="co">#&gt;         8  0  0  0 28</span></span></code></pre></div>
+<p>It’s important to note that this downsampling process <strong>changes
+the prior</strong>, and all subsequent results are based on the
+downsampled data. If you only want to downsample for speed (or another
+reason while maintaining the original proportion or prior), be sure to
+specify the prior explicitly.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">fitCylWithPrior</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, <span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span>, downSampling <span class="op">=</span> <span class="cn">TRUE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">fitCylWithPrior</span><span class="op">$</span><span class="va">confusionMatrix</span></span>
+<span><span class="co">#&gt;          Actual</span></span>
+<span><span class="co">#&gt; Predicted 4 5 6 8</span></span>
+<span><span class="co">#&gt;         4 4 4 1 0</span></span>
+<span><span class="co">#&gt;         5 0 0 0 0</span></span>
+<span><span class="co">#&gt;         6 0 0 3 0</span></span>
+<span><span class="co">#&gt;         8 0 0 0 4</span></span></code></pre></div>
+<p>As we can see, the prior in this model suppresses the prediction of
+class <code>cyl = 5</code>, and the confusion matrix differs from the
+one in <code>fitCyl</code>.</p>
+</div>
+<div class="section level2">
 <h2 id="additional-features">Additional Features<a class="anchor" aria-label="anchor" href="#additional-features"></a>
 </h2>
 <ul>
@@ -379,13 +448,13 @@ to incorporate different misclassification costs.</p></li>
 </ul>
 <p>The iris dataset is a famous dataset with three species of
 flowers:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">iris</span><span class="op">$</span><span class="va">Species</span>, dnn <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     setosa versicolor  virginica </span></span>
 <span><span class="co">#&gt;         50         50         50</span></span></code></pre></div>
 <p>Suppose misclassifying versicolor into other species is very costly.
 A potential misclassification cost matrix might look like this:</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">misClassCost</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span>, <span class="fl">1</span>,</span>
 <span>                         <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>,</span>
 <span>                         <span class="fl">1</span>, <span class="fl">100</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -393,17 +462,17 @@ A potential misclassification cost matrix might look like this:</p>
 times more severe than misclassifying other species to versicolor.
 First, let’s fit the model with equal misclassification costs and
 specified misclassification costs:</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitEqualCost</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, response <span class="op">=</span> <span class="va">iris</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">fitNewCost</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, response <span class="op">=</span> <span class="va">iris</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span>, misClassCost <span class="op">=</span> <span class="va">misClassCost</span><span class="op">)</span></span></code></pre></div>
 <p>The prediction distributions with equal misclassification costs:</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fitEqualCost</span>, <span class="va">iris</span><span class="op">)</span>, dnn <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     setosa versicolor  virginica </span></span>
 <span><span class="co">#&gt;         50         49         51</span></span></code></pre></div>
 <p>The prediction distributions with specified misclassification
 costs:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fitNewCost</span>, <span class="va">iris</span><span class="op">)</span>, dnn <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     setosa versicolor  virginica </span></span>
 <span><span class="co">#&gt;         50         63         37</span></span></code></pre></div>
