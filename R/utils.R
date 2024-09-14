@@ -347,13 +347,13 @@ checkPriorAndMisClassCost <- function(prior, misClassCost, response){
   freqObs <- table(response, dnn = NULL) / length(response) # Default: Estimated Prior
 
   if (is.null(prior)) { # prior fix
-    prior <- freqObs
+    prior <- as.vector(freqObs)
   } else {
-    if (!getNumFlag(prior) || any(prior < 0)) stop("prior must be non-negative numbers")
+    if (!is.numeric(prior) || any(prior < 0)) stop("prior must be non-negative numbers")
     if (length(prior) != nlevels(response))
       stop("The length of 'prior' must be equal to the number of response levels (", nlevels(response), ").")
     if (!is.null(names(prior))) prior <- prior[matchWrapper(names(prior), levels(response))]
-    prior <- prior / sum(prior)
+    prior <- as.vector(prior) / sum(prior)
   }
 
   if (is.null(misClassCost)){ # fix misClassCost fix

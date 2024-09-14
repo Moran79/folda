@@ -11,6 +11,15 @@ test_that("Downsampling and Balanced Group", {
 })
 
 
+test_that("Prior check", {
+  skip_on_cran()
+  priorObs <- table(iris$Species)
+  priorChecked <- checkPriorAndMisClassCost(priorObs, NULL, iris$Species)$prior
+  priorExpected <- c(1/3,1/3,1/3); names(priorExpected) <- levels(iris$Species)
+  expect_equal(priorChecked, priorExpected)
+})
+
+
 test_that("Missing Value Imputation", {
   skip_on_cran()
   dat <- data.frame(X1 = rep(NA,5),
