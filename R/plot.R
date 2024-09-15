@@ -57,7 +57,7 @@ plot.ULDA <- function(x, datX, response, ...){
   response <- droplevels(as.factor(response))
   if(!identical(x$misClassCost, checkPriorAndMisClassCost(NULL, NULL, response)$misClassCost))
     warning("With customized misClassCost, plot may not reflect real decision boundaries")
-  LDscores <- getLDscores(modelLDA = x, data = datX, nScores = min(2, ncol(x$scaling)))
+  LDscores <- round(getLDscores(modelLDA = x, data = datX, nScores = min(2, ncol(x$scaling))), 10) # increased stability
   datPlot <- cbind.data.frame(response = response, LDscores)
 
   if(dim(x$scaling)[2] == 1){ # Only one LD is available, draw the histogram
