@@ -76,10 +76,11 @@ plot.ULDA <- function(x, datX, response, ...){
     datPlot <- rbind(datPlot, datPlot) # In case some groups only have one observation
     datPlot <- do.call(rbind, lapply(seq_along(estimatedPrior), function(i) cbind(with(stats::density(datPlot$LD1[datPlot$response == names(estimatedPrior)[i]]), data.frame(LD1 = x, density = y * estimatedPrior[i])), response = names(estimatedPrior)[i])))
     datBounds <- getBoundary1D(prior = x$prior, groupMeans = x$groupMeans, xRange = range(LDscores))
+    datBounds$textInfo$density <- max(datPlot$density) # write the y position for text
     p <- ggplot2::ggplot(data = datPlot)+
       ggplot2::geom_ribbon(ggplot2::aes(x = LD1, ymin = 0, ymax = density, fill = response), alpha = 0.8)+
       ggplot2::geom_vline(xintercept = datBounds$positionX, color = "black", linetype = "dotted")+
-      ggplot2::geom_text(data = datBounds$textInfo, ggplot2::aes(x = xText, y = max(datPlot$density), label = yPred, color = yPred), show.legend = FALSE)+
+      ggplot2::geom_text(data = datBounds$textInfo, ggplot2::aes(x = xText, y = density, label = yPred, color = yPred), show.legend = FALSE)+
       ggplot2::scale_fill_manual(values = colorManual)+
       ggplot2::scale_color_manual(values = colorManual)+
       ggplot2::labs(title = "Density plot of the first linear discriminant score", subtitle = "Dotted line is the decision boundary")+
