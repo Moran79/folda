@@ -34,7 +34,8 @@ plot.ULDA <- function(x, datX, response, ...){
   }
 
   getBoundary1D <- function(prior, groupMeans, xRange, tol = 1e-10){
-    prior <- as.vector(prior); groupMeans <- as.vector(groupMeans)
+    levelName <- names(prior); prior <- as.vector(prior)
+    groupMeans <- as.vector(groupMeans)
     targetNum <- log(prior) - 0.5 * groupMeans^2
     cutoffCandidates <- c(); cutOffFake <- c()
 
@@ -43,14 +44,23 @@ plot.ULDA <- function(x, datX, response, ...){
         cutoffCandidates <- c(cutoffCandidates, -diff(targetNum[c(i,j)]) / diff(groupMeans[c(i,j)]))
       }
     }
-    cutoffCandidates <- stats::na.omit(cutoffCandidates)
+    cutoffCandidates <- sort(stats::na.omit(cutoffCandidates))
     cutoffCandidates <- cutoffCandidates[cutoffCandidates >= xRange[1] & cutoffCandidates <= xRange[2]]
+    yPred <- c(); leftClass <- rightClass <- levelName[which.max(prior)]
 
     for(cutoff in cutoffCandidates){
-      if(which.max((cutoff + tol) * groupMeans + targetNum) == which.max((cutoff - tol) * groupMeans + targetNum))
-        cutOffFake <- c(cutOffFake, cutoff)
+      leftClass <- levelName[which.max((cutoff - tol) * groupMeans + targetNum)]
+      rightClass <- levelName[which.max((cutoff + tol) * groupMeans + targetNum)]
+      if(leftClass != rightClass){
+        yPred <- c(yPred, leftClass)
+      }else cutOffFake <- c(cutOffFake, cutoff)
     }
-    return(setdiff(cutoffCandidates, cutOffFake))
+    yPred <- c(yPred, rightClass)
+    cutoffCandidates <- setdiff(cutoffCandidates, cutOffFake)
+    xText <- c(xRange[1], cutoffCandidates, xRange[2])
+    xText <- diff(xText) / 2 + xText[seq_len(length(xText) - 1)] # get mid point
+    return(list(positionX = cutoffCandidates,
+                textInfo = data.frame(xText = xText, yPred = yPred)))
   }
 
   if(missing(datX) || missing(response)) stop("Please input the training X and Y for plotting")
@@ -59,16 +69,19 @@ plot.ULDA <- function(x, datX, response, ...){
     warning("With customized misClassCost, plot may not reflect real decision boundaries")
   LDscores <- round(getLDscores(modelLDA = x, data = datX, nScores = min(2, ncol(x$scaling))), 10) # increased stability
   datPlot <- cbind.data.frame(response = response, LDscores)
+  colorManual <- grDevices::hcl.colors(nlevels(response)); names(colorManual) <- levels(response)
 
   if(dim(x$scaling)[2] == 1){ # Only one LD is available, draw the histogram
     estimatedPrior <- table(response, dnn = NULL) / length(response)
     datPlot <- rbind(datPlot, datPlot) # In case some groups only have one observation
     datPlot <- do.call(rbind, lapply(seq_along(estimatedPrior), function(i) cbind(with(stats::density(datPlot$LD1[datPlot$response == names(estimatedPrior)[i]]), data.frame(LD1 = x, density = y * estimatedPrior[i])), response = names(estimatedPrior)[i])))
-    positionX <- getBoundary1D(prior = x$prior, groupMeans = x$groupMeans, xRange = range(LDscores))
+    datBounds <- getBoundary1D(prior = x$prior, groupMeans = x$groupMeans, xRange = range(LDscores))
     p <- ggplot2::ggplot(data = datPlot)+
       ggplot2::geom_ribbon(ggplot2::aes(x = LD1, ymin = 0, ymax = density, fill = response), alpha = 0.8)+
-      ggplot2::geom_vline(xintercept = positionX, color = "black", linetype = "dotted")+
-      ggplot2::scale_fill_manual(values = grDevices::hcl.colors(nlevels(response)))+
+      ggplot2::geom_vline(xintercept = datBounds$positionX, color = "black", linetype = "dotted")+
+      ggplot2::geom_text(data = datBounds$textInfo, ggplot2::aes(x = xText, y = max(datPlot$density), label = yPred, color = yPred), show.legend = FALSE)+
+      ggplot2::scale_fill_manual(values = colorManual)+
+      ggplot2::scale_color_manual(values = colorManual)+
       ggplot2::labs(title = "Density plot of the first linear discriminant score", subtitle = "Dotted line is the decision boundary")+
       ggplot2::theme_bw()
   } else{
@@ -80,8 +93,8 @@ plot.ULDA <- function(x, datX, response, ...){
       ggplot2::geom_raster(data = fakeLDs, ggplot2::aes(x = LD1, y = LD2, fill = Y), alpha = 0.4, show.legend = FALSE)+
       ggplot2::geom_point(ggplot2::aes(x = LD1, y = LD2, color = response), alpha = 0.5)+
       ggplot2::geom_contour(data = fakeLDs, ggplot2::aes(x = LD1, y = LD2, z = as.integer(Y)), color = "white", linetype = "dotted")+
-      ggplot2::scale_color_manual(values = grDevices::hcl.colors(nlevels(response)))+
-      ggplot2::scale_fill_manual(values = grDevices::hcl.colors(nlevels(response)))+
+      ggplot2::scale_color_manual(values = colorManual)+
+      ggplot2::scale_fill_manual(values = colorManual)+
       ggplot2::labs(title = "Scatter plot of the first two linear discriminant scores")+
       ggplot2::theme_bw()
   }
