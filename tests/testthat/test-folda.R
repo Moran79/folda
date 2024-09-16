@@ -26,3 +26,11 @@ test_that("folda: Correction and alpha", {
   result <- round(fitPillai$forwardInfo$threshold, 5)
   expect_equal(result, c(0.00303, 0.00053, 0.00027, 0.00019))
 })
+
+test_that("folda: work on tibble", {
+  skip_on_cran()
+  dat <- ggplot2::diamonds[1:100,]
+  fitPillai <- folda(dat[, -2], response = dat[[2]])
+  result <- predict(fitPillai, dat)
+  expect_equal(result[1:4], c("Ideal", "Premium", "Premium", "Very Good"))
+})

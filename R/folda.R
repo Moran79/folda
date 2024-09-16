@@ -6,7 +6,7 @@
 #' perform downsampling, and compute the linear discriminant scores and group
 #' means for classification. The function returns a fitted ULDA model object.
 #'
-#' @param datX A data frame containing the predictor variables.
+#' @param datX A data frame of predictor variables.
 #' @param response A factor representing the response variable with multiple
 #'   classes.
 #' @param subsetMethod A character string specifying the method for variable
@@ -88,8 +88,11 @@ folda <- function(datX,
 
   # Pre-processing: Arguments ----------------------------------
 
-  if (!is.data.frame(datX)) stop("datX must be a data.frame")
-  response <- droplevels(as.factor(response))
+  datX <- data.frame(datX) # change to data.frame, remove the potential tibble attribute
+  for(i in seq_along(datX)){ # remove ordered factors
+    if(inherits(datX[,i], c("ordered"))) class(datX[,i]) <- "factor"
+  }
+  response <- droplevels(factor(response, ordered = FALSE)) # remove ordered factors
   subsetMethod <- match.arg(subsetMethod, c("forward", "all"))
 
   # Pre-processing: Data Cleaning -----------------------------------------------

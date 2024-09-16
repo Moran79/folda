@@ -19,7 +19,7 @@ folda(
 )
 }
 \arguments{
-\item{datX}{A data frame containing the predictor variables.}
+\item{datX}{A data frame of predictor variables.}
 
 \item{response}{A factor representing the response variable with multiple
 classes.}
