@@ -62,7 +62,8 @@ plot.ULDA <- function(x, datX, response, ...){
 
   if(dim(x$scaling)[2] == 1){ # Only one LD is available, draw the histogram
     estimatedPrior <- table(response, dnn = NULL) / length(response)
-    datPlot <- do.call(rbind, lapply(seq_along(estimatedPrior), function(i) cbind(with(stats::density(datPlot$LD1[response == names(estimatedPrior)[i]]), data.frame(LD1 = x, density = y * estimatedPrior[i])), response = names(estimatedPrior)[i])))
+    datPlot <- rbind(datPlot, datPlot) # In case some groups only have one observation
+    datPlot <- do.call(rbind, lapply(seq_along(estimatedPrior), function(i) cbind(with(stats::density(datPlot$LD1[datPlot$response == names(estimatedPrior)[i]]), data.frame(LD1 = x, density = y * estimatedPrior[i])), response = names(estimatedPrior)[i])))
     positionX <- getBoundary1D(prior = x$prior, groupMeans = x$groupMeans, xRange = range(LDscores))
     p <- ggplot2::ggplot(data = datPlot)+
       ggplot2::geom_ribbon(ggplot2::aes(x = LD1, ymin = 0, ymax = density, fill = response), alpha = 0.8)+
