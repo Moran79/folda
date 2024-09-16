@@ -219,7 +219,7 @@ folda <- function(datX,
 #' prob_predictions <- predict(fit, iris, type = "prob")
 predict.ULDA <- function(object, newdata, type = c("response", "prob"), ...){
   type <- match.arg(type, c("response", "prob"))
-  LDscores <- getLDscores(modelLDA = object, data = newdata)
+  LDscores <- getLDscores(modelULDA = object, data = newdata)
   loglikelihood <- LDscores %*% t(object$groupMeans) + matrix(log(object$prior) - 0.5 * rowSums(object$groupMeans^2), nrow(LDscores), length(object$prior), byrow = TRUE)
   likelihood <- exp(loglikelihood - apply(loglikelihood, 1, max))
   posterior <- likelihood / apply(likelihood, 1, sum)

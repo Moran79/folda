@@ -394,7 +394,7 @@ checkPriorAndMisClassCost <- function(prior, misClassCost, response){
 #'
 #' @noRd
 #'
-#' @param modelLDA A fitted LDA model object containing the scaling matrix and
+#' @param modelULDA A fitted LDA model object containing the scaling matrix and
 #'   the reference structure for missing data.
 #' @param data A data frame containing the predictor variables for which to
 #'   compute the linear discriminant scores.
@@ -404,14 +404,14 @@ checkPriorAndMisClassCost <- function(prior, misClassCost, response){
 #'   observations and columns correspond to the computed discriminant scores.
 #'   If `nScores > 0`, only the specified number of scores is returned; otherwise,
 #'   all scores are computed and returned.
-getLDscores <- function(modelLDA, data, nScores = -1){
-  data <- getDataInShape(data = data, missingReference = modelLDA$misReference)
-  modelX <- getDesignMatrix(modelLDA = modelLDA, data = data, scale = TRUE)
+getLDscores <- function(modelULDA, data, nScores = -1){
+  data <- getDataInShape(data = data, missingReference = modelULDA$misReference)
+  modelX <- getDesignMatrix(modelULDA = modelULDA, data = data, scale = TRUE)
   if(nScores > 0){
-    nScores <- min(nScores, ncol(modelLDA$scaling))
-    modelLDA$scaling <- modelLDA$scaling[, seq_len(nScores), drop = FALSE]
+    nScores <- min(nScores, ncol(modelULDA$scaling))
+    modelULDA$scaling <- modelULDA$scaling[, seq_len(nScores), drop = FALSE]
   }
-  LDscores <- modelX %*% modelLDA$scaling
+  LDscores <- modelX %*% modelULDA$scaling
   return(LDscores)
 }
 
@@ -420,7 +420,7 @@ getLDscores <- function(modelLDA, data, nScores = -1){
 #'
 #' @noRd
 #'
-#' @param modelLDA A fitted LDA model object containing the terms, variable
+#' @param modelULDA A fitted LDA model object containing the terms, variable
 #'   indices, variable centers, and scaling factors.
 #' @param data A data frame containing the predictor variables that are used to
 #'   create the design matrix.
@@ -431,12 +431,12 @@ getLDscores <- function(modelLDA, data, nScores = -1){
 #'   each column to a predictor variable. If `scale = TRUE`, the variables are
 #'   centered and scaled based on the means and standard deviations provided in
 #'   the LDA model object.
-getDesignMatrix <- function(modelLDA, data, scale = FALSE){
-  Terms <- stats::delete.response(modelLDA$terms)
-  modelX <- stats::model.matrix(Terms, data = data, xlev = modelLDA$xlevels)
+getDesignMatrix <- function(modelULDA, data, scale = FALSE){
+  Terms <- stats::delete.response(modelULDA$terms)
+  modelX <- stats::model.matrix(Terms, data = data, xlev = modelULDA$xlevels)
   if(scale){ # Reserved for internal usage from getLDscores
-    modelX <- sweep(modelX[, modelLDA$varIdx, drop = FALSE], 2, modelLDA$varCenter, "-")
-    modelX <- sweep(modelX, 2, modelLDA$varSD, "/")
+    modelX <- sweep(modelX[, modelULDA$varIdx, drop = FALSE], 2, modelULDA$varCenter, "-")
+    modelX <- sweep(modelX, 2, modelULDA$varSD, "/")
   }
   return(modelX)
 }

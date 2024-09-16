@@ -67,7 +67,7 @@ plot.ULDA <- function(x, datX, response, ...){
   response <- droplevels(as.factor(response))
   if(!identical(x$misClassCost, checkPriorAndMisClassCost(NULL, NULL, response)$misClassCost))
     warning("With customized misClassCost, plot may not reflect real decision boundaries")
-  LDscores <- round(getLDscores(modelLDA = x, data = datX, nScores = min(2, ncol(x$scaling))), 10) # increased stability
+  LDscores <- round(getLDscores(modelULDA = x, data = datX, nScores = min(2, ncol(x$scaling))), 10) # increased stability
   datPlot <- cbind.data.frame(response = response, LDscores)
   colorManual <- grDevices::hcl.colors(nlevels(response)); names(colorManual) <- levels(response)
 
