@@ -10,6 +10,7 @@ test_that("Forward Selection on Dummy", {
   expect_equal(length(fitWilks$forwardInfo$var), 1)
 })
 
+
 test_that("folda: Prior and Misclassification Cost", {
   skip_on_cran()
   fitPillai <- folda(iris[, -5],response = iris[, 5],prior = c(0,1,2),
@@ -20,6 +21,7 @@ test_that("folda: Prior and Misclassification Cost", {
   expect_equal(result, c(61L, 89L))
 })
 
+
 test_that("folda: Correction and alpha", {
   skip_on_cran()
   fitPillai <- folda(iris[, -5], response = iris[, 5], correction = FALSE, alpha = 0.8)
@@ -27,10 +29,18 @@ test_that("folda: Correction and alpha", {
   expect_equal(result, c(0.00303, 0.00053, 0.00027, 0.00019))
 })
 
+
 test_that("folda: work on tibble", {
   skip_on_cran()
   dat <- ggplot2::diamonds[1:100,]
   fitPillai <- folda(dat[, -2], response = dat[[2]])
   result <- predict(fitPillai, dat)
   expect_equal(result[1:4], c("Ideal", "Premium", "Premium", "Very Good"))
+})
+
+
+test_that("folda: all columns are constant", {
+  skip_on_cran()
+  dat <- iris[, c(5,1:4)]; dat[, 2:5] <- dat[rep(1,150), 2:5]
+  expect_error(folda(dat[, -1], dat[, 1]), "No available observations or features, which maybe due to preprocessing steps.")
 })

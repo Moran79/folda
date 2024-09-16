@@ -146,13 +146,13 @@ folda <- function(datX,
   Hw <- m - groupMeans[response, , drop = FALSE]
   if(diff(dim(m)) < 0){ # More rows than columns
     qrRes <- qrEigen(Hw)
-    fitSVD <- svdEigen(rbind(Hb, qrRes$R))
-  }else fitSVD <- svdEigen(rbind(Hb, Hw))
+    fitSVD <- saferSVD(rbind(Hb, qrRes$R))
+  }else fitSVD <- saferSVD(rbind(Hb, Hw))
 
   # Step 2: SVD on the P matrix
   N <- nrow(m); J <- nlevels(response)
   rankT <- sum(fitSVD$d >= max(dim(fitSVD$u), dim(fitSVD$v)) * .Machine$double.eps * fitSVD$d[1])
-  fitSVDp <- svdEigen(fitSVD$u[seq_len(J), seq_len(rankT), drop = FALSE], uFlag = FALSE)
+  fitSVDp <- saferSVD(fitSVD$u[seq_len(J), seq_len(rankT), drop = FALSE], uFlag = FALSE)
   rankAll <- min(J - 1, sum(fitSVDp$d >= max(J, rankT) * .Machine$double.eps * fitSVDp$d[1]))
 
   # Step 3: Transform Sw into identity matrix

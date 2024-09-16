@@ -43,6 +43,7 @@ missingFix <- function(data, missingMethod = c("medianFlag", "newLevel")){
 
   # remove constant columns
   data <- data[, nonConstInd(data = data), drop = FALSE]
+  if(any(dim(data) == 0)) return(list(data = data, ref = data)) # all columns are constant
 
   # Add Missing Columns #
   numOrNot <- getNumFlag(data); NAorNot <- sapply(data, anyNA)
@@ -439,4 +440,30 @@ getDesignMatrix <- function(modelLDA, data, scale = FALSE){
   }
   return(modelX)
 }
+
+
+saferSVD <- function(x, uFlag = TRUE) {
+  # For users that does not have the latest RcppEigen module
+
+  fitSVD <- tryCatch({
+    if (uFlag) {
+      svdEigen(x)
+    } else svdEigen(x, uFlag = FALSE)
+  }, error = function(e) {NULL})
+
+  if (!is.null(fitSVD) && !anyNA(fitSVD$v)) return(fitSVD)
+
+  # if svdEigen is NULL / NA in the fitSVD -> fallback to base::svd
+  fitSVD <- tryCatch({
+    if (uFlag) {
+      svd(x)
+    } else svd(x, nu = 0L)
+  }, error = function(e) {stop("Both svd modules failed, check your input data.")})
+
+  return(fitSVD)
+}
+
+
+
+
 
