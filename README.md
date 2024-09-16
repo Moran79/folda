@@ -142,6 +142,18 @@ plot(fit, datX = datX, response = response)
 
 <img src="man/figures/README-unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;" />
 
+One-dimensional plot:
+
+``` r
+# A 1D plot is created when there is only one feature 
+# or for binary classification problems.
+mpgSmall <- mpg[, c("cyl", "displ")]
+fitSmall <- folda(mpgSmall[, -1, drop = FALSE], mpgSmall[, 1])
+plot(fitSmall, mpgSmall, mpgSmall[, 1])
+```
+
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;" />
+
 Make predictions:
 
 ``` r

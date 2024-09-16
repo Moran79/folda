@@ -22,7 +22,7 @@
 
 plot.ULDA <- function(x, datX, response, ...){
 
-  LD1 <- LD2 <- Y <- density <- NULL
+  LD1 <- LD2 <- Y <- xText <- yPred <- density <- NULL
 
   predictInternal <- function(x, LDscores){ # predict class based on LDscores
     x$groupMeans <- x$groupMeans[, seq_len(ncol(LDscores)), drop = FALSE]
