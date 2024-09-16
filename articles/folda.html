@@ -172,8 +172,16 @@ shown to generally have greater statistical power than Wilks’ Lambda
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fit</span>, datX <span class="op">=</span> <span class="va">datX</span>, response <span class="op">=</span> <span class="va">response</span><span class="op">)</span></span></code></pre></div>
 <p><img src="folda_files/figure-html/unnamed-chunk-5-1.png" width="70%" style="display: block; margin: auto;"></p>
-<p>Make predictions:</p>
+<p>One-dimensional plot:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># A 1D plot is created when there is only one feature </span></span>
+<span><span class="co"># or for binary classification problems.</span></span>
+<span><span class="va">mpgSmall</span> <span class="op">&lt;-</span> <span class="va">mpg</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"cyl"</span>, <span class="st">"displ"</span><span class="op">)</span><span class="op">]</span></span>
+<span><span class="va">fitSmall</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">mpgSmall</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span>, drop <span class="op">=</span> <span class="cn">FALSE</span><span class="op">]</span>, <span class="va">mpgSmall</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">fitSmall</span>, <span class="va">mpgSmall</span>, <span class="va">mpgSmall</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
+<p><img src="folda_files/figure-html/unnamed-chunk-6-1.png" width="70%" style="display: block; margin: auto;"></p>
+<p>Make predictions:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">datX</span>, type <span class="op">=</span> <span class="st">"response"</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "4" "4" "4" "4" "6" "4"</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">datX</span>, type <span class="op">=</span> <span class="st">"prob"</span><span class="op">)</span><span class="op">)</span> <span class="co"># Posterior probabilities</span></span>
@@ -192,7 +200,7 @@ shown to generally have greater statistical power than Wilks’ Lambda
 classes is perfectly separable from another, a condition under which
 Wilks’ Lambda performs poorly. Now let’s predict the model of the
 car.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitW</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">[</span>, <span class="op">-</span><span class="fl">2</span><span class="op">]</span>, <span class="va">mpg</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>, testStat <span class="op">=</span> <span class="st">"Wilks"</span><span class="op">)</span></span>
 <span><span class="va">fitW</span><span class="op">$</span><span class="va">forwardInfo</span></span>
 <span><span class="co">#&gt;                var statOverall statDiff threshold</span></span>
@@ -201,7 +209,7 @@ car.</p>
 a4, a4 quattro, and a6 quattro from other models. However, it
 unexpectedly stops since the Wilks’ Lambda = 0, leading to a refitting
 accuracy of 0.0812.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitP</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">[</span>, <span class="op">-</span><span class="fl">2</span><span class="op">]</span>, <span class="va">mpg</span><span class="op">[</span>, <span class="fl">2</span><span class="op">]</span>, testStat <span class="op">=</span> <span class="st">"Pillai"</span><span class="op">)</span></span>
 <span><span class="va">fitP</span><span class="op">$</span><span class="va">forwardInfo</span></span>
 <span><span class="co">#&gt;                       var statOverall  statDiff threshold</span></span>
@@ -235,7 +243,7 @@ accuracy of 0.0812.</p>
 the refitting accuracy is 0.9231. Additionally, <code><a href="https://rdrr.io/pkg/MASS/man/lda.html" class="external-link">MASS::lda()</a></code>
 would throw an error in this scenario due to the “constant within
 groups” issue.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># MASS::lda(model~., data = mpg)</span></span>
 <span></span>
 <span><span class="co">#&gt; Error in lda.default(x, grouping, ...) : </span></span>
@@ -282,7 +290,7 @@ Redundant levels are also removed.</li>
 </ol>
 </li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Create a dataset with missing values</span></span>
 <span><span class="op">(</span><span class="va">datNA</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>X1 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, <span class="co"># All values are NA</span></span>
 <span>                     X2 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">5</span><span class="op">)</span>, levels <span class="op">=</span> <span class="va">LETTERS</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">3</span><span class="op">]</span><span class="op">)</span>, <span class="co"># Factor with all NA values</span></span>
@@ -297,7 +305,7 @@ Redundant levels are also removed.</li>
 <span><span class="co">#&gt; 4 NA &lt;NA&gt;  4  D 10    B</span></span>
 <span><span class="co">#&gt; 5 NA &lt;NA&gt;  5  E NA    B</span></span></code></pre></div>
 <p>Impute missing values and create a missing reference:</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">imputedSummary</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/missingFix.html">missingFix</a></span><span class="op">(</span><span class="va">datNA</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; $data</span></span>
 <span><span class="co">#&gt;   X3 X4 X5          X6 X5_FLAG</span></span>
@@ -315,7 +323,7 @@ NA). X3 and X4 remain unchanged. X5 is imputed with the median (3), and
 a new column X5_FLAG is added to indicate missing values. X6 is imputed
 with a new level ‘new0_0Level’.</p>
 <p>Now, let’s create a new dataset for imputation.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="op">(</span><span class="va">datNAnew</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>X1 <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="co"># New column not in the reference</span></span>
 <span>                        X3 <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">3</span>, <span class="co"># Matching column with no NAs</span></span>
 <span>                        X4 <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span>, <span class="st">"F"</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span>, <span class="co"># Factor with a new level "F" and missing values</span></span>
@@ -325,7 +333,7 @@ with a new level ‘new0_0Level’.</p>
 <span><span class="co">#&gt; 2  2  2    F  2</span></span>
 <span><span class="co">#&gt; 3  3  3 &lt;NA&gt;  3</span></span></code></pre></div>
 <p>Apply the missing reference to the new dataset:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/getDataInShape.html">getDataInShape</a></span><span class="op">(</span><span class="va">datNAnew</span>, <span class="va">imputedSummary</span><span class="op">$</span><span class="va">ref</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   X3 X4 X5          X6 X5_FLAG</span></span>
 <span><span class="co">#&gt; 1  1  E  3 new0_0Level       1</span></span>
@@ -340,20 +348,20 @@ with the level “new0_0Level”.</p>
 <p>Next, we show an example using <code>folda</code> with the airquality
 dataset. First, let’s check which columns in airquality have missing
 values:</p>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/lapply.html" class="external-link">sapply</a></span><span class="op">(</span><span class="va">airquality</span>, <span class="va">anyNA</span><span class="op">)</span> <span class="co"># Ozone and Solar.R have NAs</span></span>
 <span><span class="co">#&gt;   Ozone Solar.R    Wind    Temp   Month     Day </span></span>
 <span><span class="co">#&gt;    TRUE    TRUE   FALSE   FALSE   FALSE   FALSE</span></span></code></pre></div>
 <p>Our response variable is the 5th column (Month):</p>
-<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitAir</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">airquality</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, <span class="va">airquality</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span><span class="op">)</span></span></code></pre></div>
 <p>The generated missing reference is:</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitAir</span><span class="op">$</span><span class="va">misReference</span></span>
 <span><span class="co">#&gt;   Ozone Solar.R Wind Temp Day Ozone_FLAG Solar.R_FLAG</span></span>
 <span><span class="co">#&gt; 1  31.5     205  9.7   79  16          1            1</span></span></code></pre></div>
 <p>To make prediction:</p>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fitAir</span>, <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="cn">NA</span>, <span class="fl">4</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "6" "6" "6" "6"</span></span></code></pre></div>
 <p>Notice that no issues arise during predicting, even when the new data
@@ -380,7 +388,7 @@ fewer than <code>kSample</code> samples, all observations from that
 class will be retained.</p>
 <p>Suppose we want to predict the number of cylinders (<code>cyl</code>)
 in a car. The number of observations in each class is:</p>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">$</span><span class="va">cyl</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;  4  5  6  8 </span></span>
@@ -388,7 +396,7 @@ in a car. The number of observations in each class is:</p>
 <p>If we apply downsampling without specifying <code>kSample</code>, we
 will randomly select 4 samples from each group, as the smallest group
 (<code>cyl = 5</code>) has only 4 observations.</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">443</span><span class="op">)</span></span>
 <span><span class="va">fitCyl</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, <span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span>, downSampling <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">fitCyl</span><span class="op">$</span><span class="va">confusionMatrix</span></span>
@@ -401,7 +409,7 @@ will randomly select 4 samples from each group, as the smallest group
 <p>We can also set <code>kSample = 30</code>. In this case, 30 random
 samples will be selected from <code>cyl = 4, 6, 8</code>, while 4
 samples will be chosen from <code>cyl = 5</code>.</p>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitCyl30</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, <span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span>, downSampling <span class="op">=</span> <span class="cn">TRUE</span>, kSample <span class="op">=</span> <span class="fl">30</span><span class="op">)</span></span>
 <span><span class="va">fitCyl30</span><span class="op">$</span><span class="va">confusionMatrix</span></span>
 <span><span class="co">#&gt;          Actual</span></span>
@@ -415,7 +423,7 @@ the prior</strong>, and all subsequent results are based on the
 downsampled data. If you only want to downsample for speed (or another
 reason while maintaining the original proportion or prior), be sure to
 specify the prior explicitly.</p>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitCylWithPrior</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, <span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span>, downSampling <span class="op">=</span> <span class="cn">TRUE</span>, prior <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">mpg</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">fitCylWithPrior</span><span class="op">$</span><span class="va">confusionMatrix</span></span>
 <span><span class="co">#&gt;          Actual</span></span>
@@ -448,13 +456,13 @@ to incorporate different misclassification costs.</p></li>
 </ul>
 <p>The iris dataset is a famous dataset with three species of
 flowers:</p>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="va">iris</span><span class="op">$</span><span class="va">Species</span>, dnn <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     setosa versicolor  virginica </span></span>
 <span><span class="co">#&gt;         50         50         50</span></span></code></pre></div>
 <p>Suppose misclassifying versicolor into other species is very costly.
 A potential misclassification cost matrix might look like this:</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">misClassCost</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fl">100</span>, <span class="fl">1</span>,</span>
 <span>                         <span class="fl">1</span>, <span class="fl">0</span>, <span class="fl">1</span>,</span>
 <span>                         <span class="fl">1</span>, <span class="fl">100</span>, <span class="fl">0</span><span class="op">)</span>, <span class="fl">3</span>, <span class="fl">3</span>, byrow <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -462,17 +470,17 @@ A potential misclassification cost matrix might look like this:</p>
 times more severe than misclassifying other species to versicolor.
 First, let’s fit the model with equal misclassification costs and
 specified misclassification costs:</p>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">fitEqualCost</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, response <span class="op">=</span> <span class="va">iris</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span><span class="op">)</span></span>
 <span><span class="va">fitNewCost</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/folda.html">folda</a></span><span class="op">(</span><span class="va">iris</span><span class="op">[</span>, <span class="op">-</span><span class="fl">5</span><span class="op">]</span>, response <span class="op">=</span> <span class="va">iris</span><span class="op">[</span>, <span class="fl">5</span><span class="op">]</span>, misClassCost <span class="op">=</span> <span class="va">misClassCost</span><span class="op">)</span></span></code></pre></div>
 <p>The prediction distributions with equal misclassification costs:</p>
-<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fitEqualCost</span>, <span class="va">iris</span><span class="op">)</span>, dnn <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     setosa versicolor  virginica </span></span>
 <span><span class="co">#&gt;         50         49         51</span></span></code></pre></div>
 <p>The prediction distributions with specified misclassification
 costs:</p>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/table.html" class="external-link">table</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fitNewCost</span>, <span class="va">iris</span><span class="op">)</span>, dnn <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span></span>
 <span><span class="co">#&gt;     setosa versicolor  virginica </span></span>
 <span><span class="co">#&gt;         50         63         37</span></span></code></pre></div>
