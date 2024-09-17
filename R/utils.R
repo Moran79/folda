@@ -291,14 +291,29 @@ getNumFlag <- function(data, index = FALSE){
 
 #' Calculate the Mode of a Factor Variable with Optional Priors
 #'
-#' @noRd
+#' This function calculates the mode of a given factor or vector that can be
+#' coerced into a factor. You can optionally provide prior weights for each
+#' level of the factor.
 #'
 #' @param v A factor or vector that can be coerced into a factor. The mode will
 #'   be calculated from the levels of this factor.
 #' @param prior A numeric vector of prior weights for each level of the factor.
+#'   If not provided, all levels will be given equal weight.
 #'
 #' @return The mode of the factor `v` as a character string. If all values are
 #'   `NA`, the function returns `NA`.
+#'
+#' @export
+#'
+#' @examples
+#' # Example 1: Mode without priors
+#' v <- factor(c("apple", "banana", "apple", "orange", NA))
+#' getMode(v)
+#'
+#' # Example 2: Mode with priors
+#' v <- factor(c("apple", "banana", "apple", "orange", NA))
+#' prior <- c(apple = 0.5, banana = 1.5, orange = 1)
+#' getMode(v, prior)
 getMode <- function(v, prior){
   #> NA will be ignored
   v <- as.factor(v)
@@ -328,8 +343,6 @@ getMode <- function(v, prior){
 #' matrix is set to 1 for all misclassifications and 0 for correct
 #' classifications.
 #'
-#' @noRd
-#'
 #' @param prior A numeric vector representing the prior probabilities for each
 #'   class in the response variable. If `NULL`, the observed frequencies of the
 #'   response are used as the default prior.
@@ -344,6 +357,20 @@ getMode <- function(v, prior){
 #'   probabilities for each class.} \item{misClassCost}{A square matrix
 #'   representing the misclassification costs, with rows and columns labeled by
 #'   the levels of the response variable.}
+#'
+#' @export
+#'
+#' @examples
+#' # Example 1: Using default prior and misClassCost
+#' response <- factor(c('A', 'B', 'A', 'B', 'C', 'A'))
+#' checkPriorAndMisClassCost(NULL, NULL, response)
+#'
+#' # Example 2: Providing custom prior and misClassCost
+#' prior <- c(A = 1, B = 1, C = 2)
+#' misClassCost <- matrix(c(0, 2, 10,
+#'                          1, 0, 10,
+#'                          1, 2, 0), nrow = 3, byrow = TRUE)
+#' checkPriorAndMisClassCost(prior, misClassCost, response)
 checkPriorAndMisClassCost <- function(prior, misClassCost, response){
 
   matchWrapper <- function(nameObj, nameTarget){
