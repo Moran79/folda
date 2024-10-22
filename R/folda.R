@@ -123,15 +123,22 @@ folda <- function(datX,
                              alpha = alpha,
                              correction = correction)
 
-    # When no variable is selected, use the full model
-    if(length(forwardRes$currentVarList) != 0){
-      # modify the design matrix to make it more compact
-      selectedVarRawIdx <- unique(sort(attributes(m)$assign[forwardRes$currentVarList]))
-      modelFrame <- stats::model.frame(formula = ~.-1, datX[, selectedVarRawIdx, drop = FALSE], na.action = "na.fail")
-      Terms <- stats::terms(modelFrame)
-      m <- scale(stats::model.matrix(Terms, modelFrame))
-      currentVarList <- which(colnames(m) %in% forwardRes$forwardInfo$var)
+    selectedVarRawIdx <- forwardRes$currentVarList
+    selectedVarName <- forwardRes$forwardInfo$var
+
+    if(length(selectedVarRawIdx) == 0){ # When no variable is marginal significant based on Pillai's trace
+      chiStat <- getChiSqStat(datX = m, response = response)
+      selectedVarRawIdx <- which(chiStat >= stats::qchisq(1 - 0.0001/length(chiStat), 1)) # Bonferroni with alpha = 0.0001
+      if(length(selectedVarRawIdx) == 0) selectedVarRawIdx <- which.max(chiStat)
+      selectedVarName <- colnames(m)[selectedVarRawIdx]
     }
+
+    # modify the design matrix to make it more compact
+    selectedVarRawIdx <- unique(sort(attributes(m)$assign[selectedVarRawIdx]))
+    modelFrame <- stats::model.frame(formula = ~.-1, datX[, selectedVarRawIdx, drop = FALSE], na.action = "na.fail")
+    Terms <- stats::terms(modelFrame)
+    m <- scale(stats::model.matrix(Terms, modelFrame))
+    currentVarList <- which(colnames(m) %in% selectedVarName)
   }
 
   varSD <- attr(m,"scaled:scale")[currentVarList]

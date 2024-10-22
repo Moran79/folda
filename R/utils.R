@@ -469,9 +469,88 @@ getDesignMatrix <- function(modelULDA, data, scale = FALSE){
 }
 
 
-saferSVD <- function(x, uFlag = TRUE) {
-  # For users that does not have the latest RcppEigen module
+#' Compute Chi-Squared Statistics for Variables
+#'
+#' This function calculates the chi-squared statistic for each column of `datX`
+#' against the response variable `response`. It supports both numerical and
+#' categorical predictors in `datX`. For numerical variables, it automatically
+#' discretizes them into factor levels based on standard deviations and mean,
+#' using different splitting criteria depending on the sample size.
+#'
+#' @param datX A matrix or data frame containing predictor variables. It can
+#'   consist of both numerical and categorical variables.
+#' @param response A factor representing the class labels. It must have at least
+#'   two levels for the chi-squared test to be applicable.
+#'
+#' @return A vector of chi-squared statistics, one for each predictor variable
+#'   in `datX`. For numerical variables, the chi-squared statistic is computed
+#'   after binning the variable.
+#'
+#' @details For each variable in `datX`, the function first checks if the
+#'   variable is numerical. If so, it is discretized into factor levels using
+#'   either two or three split points, depending on the sample size and the
+#'   number of levels in the `response`. Missing values are handled by assigning
+#'   them to a new factor level.
+#'
+#'   The chi-squared statistic is then computed between each predictor and the
+#'   `response`. If the chi-squared test has more than one degree of freedom,
+#'   the Wilson-Hilferty transformation is applied to adjust the statistic to a
+#'   1-degree-of-freedom chi-squared distribution.
+#'
+#' @export
+#'
+#' @references Loh, W. Y. (2009). Improving the precision of classification
+#' trees. \emph{The Annals of Applied Statistics}, 1710–1737. JSTOR.
+#'
+#' @examples
+#' datX <- data.frame(var1 = rnorm(100), var2 = factor(sample(letters[1:3], 100, replace = TRUE)))
+#' y <- factor(sample(c("A", "B"), 100, replace = TRUE))
+#' getChiSqStat(datX, y)
+getChiSqStat <- function(datX, response){
+  y <- droplevels(as.factor(response))
+  if(is.null(dim(datX))) return(getChiSqStatHelper(datX, y))
 
+  return(apply(datX, 2, function(x) getChiSqStatHelper(x, y)))
+}
+
+getChiSqStatHelper <- function(x,y){
+  if(getNumFlag(x)){ # numerical variable: first change to factor
+    m = mean(x,na.rm = T); s = stats::sd(x,na.rm = T)
+    if(sum(!is.na(x)) >= 30 * nlevels(y)){
+      splitNow = c(m - s *sqrt(3)/2, m, m + s *sqrt(3)/2)
+    }else splitNow = c(m - s *sqrt(3)/3, m + s *sqrt(3)/3)
+
+    if(length(unique(splitNow)) == 1) return(0) # No possible split
+    x = cut(x, breaks = c(-Inf, splitNow, Inf), right = TRUE)
+  }
+
+  if(anyNA(x)){
+    levels(x) = c(levels(x), 'newLevel')
+    x[is.na(x)] <- 'newLevel'
+  }
+  if(length(unique(x)) == 1) return(0) # No possible split
+
+  fit <- suppressWarnings(stats::chisq.test(x, y))
+
+  #> Change to 1-df wilson_hilferty chi-squared stat unless
+  #> the original df = 1 and p-value is larger than 10^(-16)
+  ans = unname(ifelse(fit$parameter > 1L, ifelse(fit$p.value > 10^(-16),
+                                                 stats::qchisq(1-fit$p.value, df = 1),
+                                                 wilson_hilferty(fit$statistic,fit$parameter)), fit$statistic))
+  return(ans)
+}
+
+
+wilson_hilferty = function(chi, df){ # change df = K to df = 1
+  ans = max(0, (7/9 + sqrt(df) * ( (chi / df) ^ (1/3) - 1 + 2 / (9 * df) ))^3)
+  return(ans)
+}
+
+
+# For users that does not have the latest RcppEigen module ----------------
+
+
+saferSVD <- function(x, uFlag = TRUE) {
   fitSVD <- tryCatch({
     if (uFlag) {
       svdEigen(x)
@@ -489,8 +568,4 @@ saferSVD <- function(x, uFlag = TRUE) {
 
   return(fitSVD)
 }
-
-
-
-
 
